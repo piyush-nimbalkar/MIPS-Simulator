@@ -2,11 +2,16 @@ class Instruction:
     """ Structure to store the instruction
     """
 
+    dest_reg = ''
+    src_reg = []
+    immediate = ''
+    offset = ''
+
     def __init__(self, instr_name, operands):
         self.name = instr_name
         self.type = self.__instruction_type(instr_name)
         self.func_unit = self.__functional_unit(instr_name)
-        self.operands = operands
+        self.__store_registers(instr_name, operands)
 
 
     def __instruction_type(self, name):
@@ -33,6 +38,29 @@ class Instruction:
             return 'INTEGER'
 
 
+    def __store_registers(self, name, operands):
+        for op in operands:
+            if name not in  ['SW', 'S.D', 'J', 'BNE', 'BEQ']:
+                self.dest_reg = operands[0].strip(',')
+
+            if name in ['LW', 'L.D']:
+                self.offset = operands[1].split('(')[0]
+                self.src_reg = [operands[1].split('(')[1].split(')')[0]]
+            elif name in ['SW', 'S.D']:
+                self.offset = operands[1].split('(')[0]
+                self.src_reg = [operands[0].strip(','), operands[1].split('(')[1].split(')')[0]]
+            elif name in ['DADDI', 'DSUBI', 'ANDI', 'ORI']:
+                self.src_reg = [operands[1].strip(',')]
+                self.immediate = operands[2]
+            elif name in ['BNE', 'BEQ']:
+                self.src_reg = [operands[0].strip(','), operands[1].strip(',')]
+                self.immediate = operands[2]
+            elif name in ['J']:
+                self.immediate = operands[0]
+            else:
+                self.src_reg = [operands[1].strip(','), operands[2].strip(',')]
+
+
 
 def parse(filename):
     file = open(filename, 'r')
@@ -46,10 +74,13 @@ def parse(filename):
 
 
     for obj in instructions:
-        print(obj.name),
-        print(obj.operands),
-        print(obj.type),
-        print(obj.func_unit)
+        print("Instruction: " + obj.name)
+        print("Destination: " + obj.dest_reg)
+        print("Source:      " + str(obj.src_reg))
+        print("Offset:      " + obj.offset)
+        print("Immediate:   " + obj.immediate)
+        print
+
 
 
 def main():
