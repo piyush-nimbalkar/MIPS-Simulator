@@ -1,12 +1,13 @@
 Label: LW     R1, 30(R2)
        SW     R3, 500(R4)
+       J      Blah
        L.D    F1, 30(R2)
        S.D    F3, 500(R4)
        DADD   R1, R2, R3
        DADDI  R2, R2, 43
        DSUB   R1, R2, R3
        DSUBI  R1, R2, 43
-       AND    R1, R2, R3
+Blah:  AND    R1, R2, R3
        ANDI   R1, R2, 43
        OR     R1, R2, R3
        ORI    R1, R2, 43
@@ -14,7 +15,7 @@ Label: LW     R1, 30(R2)
        SUB.D  F1, F2, F3
        MUL.D  F1, F2, F3
        DIV.D  F1, F2, F3
-       J      Label
+       J      Blah
        BNE    R3, R4, Label
        BEQ    R3, R4, Label
        HLT

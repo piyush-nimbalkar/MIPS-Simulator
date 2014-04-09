@@ -1,3 +1,6 @@
+WORD_SIZE = 4
+
+
 class Instruction:
     """ Structure to store the instruction
     """
@@ -13,7 +16,7 @@ class Instruction:
         self.type = self.__instruction_type(instr_name)
         self.func_unit = self.__functional_unit(instr_name)
         self.__store_registers(instr_name, operands)
-        self.address = Instruction.count * 4
+        self.address = Instruction.count * WORD_SIZE
         Instruction.count += 1
 
 
@@ -64,24 +67,34 @@ class Instruction:
                 self.src_reg = [operands[1].strip(','), operands[2].strip(',')]
 
 
+    def set_immediate(self, value):
+        self.immediate = value
+
+
 
 def parse(filename):
     file = open(filename, 'r')
     instructions = []
+    labels = {}
+
     for line in file:
         instruction = filter(None, line.strip().split(' '))
-        if (':' in instruction[0]):
+        if ':' in instruction[0]:
+            labels[instruction[0].strip(':')] = Instruction.count * WORD_SIZE
             instructions.append(Instruction(instruction[1], instruction[2:len(instruction)]))
         else:
             instructions.append(Instruction(instruction[0], instruction[1:len(instruction)]))
 
+    for instr in instructions:
+        if instr.immediate in labels.keys():
+            instr.set_immediate(labels[instr.immediate])
 
     for obj in instructions:
         print("Instruction: " + obj.name)
         print("Destination: " + obj.dest_reg)
         print("Source:      " + str(obj.src_reg))
         print("Offset:      " + obj.offset)
-        print("Immediate:   " + obj.immediate)
+        print("Immediate:   " + str(obj.immediate))
         print("Address:     " + str(obj.address))
         print
 
