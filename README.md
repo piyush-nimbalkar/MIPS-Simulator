@@ -1,1 +1,7 @@
-#### An emulator to show the working of a MIPS architecture
+## MIPS Simulator
+
+### Steps to Run:
+
+```
+$ python simulator.py
+```
