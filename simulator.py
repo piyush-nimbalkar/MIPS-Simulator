@@ -5,6 +5,7 @@ class Instruction:
     def __init__(self, instr_name, operands):
         self.name = instr_name
         self.type = self.__instruction_type(instr_name)
+        self.func_unit = self.__functional_unit(instr_name)
         self.operands = operands
 
 
@@ -17,6 +18,20 @@ class Instruction:
             return 'SPECIAL'
         else:
             return 'ALU'
+
+
+    def __functional_unit(self, name):
+        if name in ['ADD.D', 'SUB.D']:
+            return 'FP_ADD'
+        elif name == 'MUL.D':
+            return 'FP_MUL'
+        elif name == 'DIV.D':
+            return 'FP_DIV'
+        elif name in ['J', 'BNE', 'BEQ', 'HLT']:
+            return 'NONE'
+        else:
+            return 'INTEGER'
+
 
 
 def parse(filename):
@@ -33,7 +48,8 @@ def parse(filename):
     for obj in instructions:
         print(obj.name),
         print(obj.operands),
-        print(obj.type)
+        print(obj.type),
+        print(obj.func_unit)
 
 
 def main():
