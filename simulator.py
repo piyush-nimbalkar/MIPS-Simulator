@@ -6,12 +6,15 @@ class Instruction:
     src_reg = []
     immediate = ''
     offset = ''
+    count = 0
 
     def __init__(self, instr_name, operands):
         self.name = instr_name
         self.type = self.__instruction_type(instr_name)
         self.func_unit = self.__functional_unit(instr_name)
         self.__store_registers(instr_name, operands)
+        self.address = Instruction.count * 4
+        Instruction.count += 1
 
 
     def __instruction_type(self, name):
@@ -79,6 +82,7 @@ def parse(filename):
         print("Source:      " + str(obj.src_reg))
         print("Offset:      " + obj.offset)
         print("Immediate:   " + obj.immediate)
+        print("Address:     " + str(obj.address))
         print
 
 
