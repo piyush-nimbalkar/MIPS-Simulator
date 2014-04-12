@@ -5,10 +5,6 @@ class Instruction:
     """ Structure to store the instruction
     """
 
-    dest_reg = ''
-    src_reg = []
-    immediate = ''
-    offset = ''
     count = 0
 
     def __init__(self, instr_name, operands):
@@ -45,6 +41,10 @@ class Instruction:
 
 
     def __store_registers(self, name, operands):
+        self.dest_reg = ''
+        self.src_reg = []
+        self.immediate = ''
+        self.offset = ''
         for op in operands:
             if name not in  ['SW', 'S.D', 'J', 'BNE', 'BEQ']:
                 self.dest_reg = operands[0].strip(',')
