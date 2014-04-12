@@ -99,9 +99,27 @@ def parse(filename):
         print
 
 
+REGISTER = {}
+
+def parse_reg(filename):
+    file = open(filename, 'r')
+    reg_count = 0
+
+    for line in file:
+        value = 0
+        count = (WORD_SIZE * 8) - 1
+        for i in line.strip():
+            value += pow(2, count) * int(i)
+            count -= 1
+        REGISTER['R' + str(reg_count)] = value
+        reg_count += 1
+
+    print(REGISTER)
+
 
 def main():
-    parse("inst.txt")
+    parse('inst.txt')
+    parse_reg('reg.txt')
 
 
 if  __name__ == '__main__':
