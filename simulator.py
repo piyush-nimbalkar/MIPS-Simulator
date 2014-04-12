@@ -1,8 +1,11 @@
+from collections import deque
+
+
 DATA = {}
 REGISTER = {}
 WORD_SIZE = 4
 MEMORY_BASE_ADDRESS = 256
-
+INSTRUCTIONS = []
 
 
 class Instruction:
@@ -78,29 +81,19 @@ class Instruction:
 
 def parse(filename):
     file = open(filename, 'r')
-    instructions = []
     labels = {}
 
     for line in file:
         instruction = filter(None, line.strip().split(' '))
         if ':' in instruction[0]:
             labels[instruction[0].strip(':')] = Instruction.count * WORD_SIZE
-            instructions.append(Instruction(instruction[1], instruction[2:len(instruction)]))
+            INSTRUCTIONS.append(Instruction(instruction[1], instruction[2:len(instruction)]))
         else:
-            instructions.append(Instruction(instruction[0], instruction[1:len(instruction)]))
+            INSTRUCTIONS.append(Instruction(instruction[0], instruction[1:len(instruction)]))
 
-    for instr in instructions:
+    for instr in INSTRUCTIONS:
         if instr.immediate in labels.keys():
             instr.set_immediate(labels[instr.immediate])
-
-    for obj in instructions:
-        print("Instruction: " + obj.name)
-        print("Destination: " + obj.dest_reg)
-        print("Source:      " + str(obj.src_reg))
-        print("Offset:      " + obj.offset)
-        print("Immediate:   " + str(obj.immediate))
-        print("Address:     " + str(obj.address))
-        print
 
 
 def parse_registers(filename):
@@ -116,8 +109,6 @@ def parse_registers(filename):
         REGISTER['R' + str(reg_count)] = value
         reg_count += 1
 
-    print(REGISTER)
-
 
 def parse_data(filename):
     file = open(filename, 'r')
@@ -132,13 +123,77 @@ def parse_data(filename):
         DATA[MEMORY_BASE_ADDRESS + word_count] = value
         word_count += 1
 
-    print(DATA)
+
+
+class Status():
+    """ To store the status of the instruction
+    """
+
+    def __init__(self, instr):
+        self._instr = instr
+        self._stage = 'IF'
+
+
+    def update(self):
+        if self._stage == 'IF' and STAGE['ID'] == 0:
+            self._stage = 'ID'
+            STAGE['IF'] = 0
+            STAGE['ID'] = 1
+        elif self._stage == 'ID' and STAGE['EX'] == 0:
+            self._stage = 'EX'
+            STAGE['ID'] = 0
+            STAGE['EX'] = 1
+        elif self._stage == 'EX' and STAGE['WB'] == 0:
+            self._stage = 'WB'
+            STAGE['EX'] = 0
+            STAGE['WB'] = 1
+        elif self._stage == 'WB':
+            self._stage = 'DONE'
+            STAGE['WB'] = 0
+
+
+STAGE = {
+    'IF': 0,
+    'ID': 0,
+    'EX': 0,
+    'WB': 0
+}
+
+def simulate_run():
+    clock_cycle = 1
+    instr_count = 0
+    pending_queue = deque([])
+
+    while True:
+        print('\nClock: ' + str(clock_cycle))
+        for i in range(0, len(pending_queue)):
+            status = pending_queue.pop()
+            status.update()
+            if status._stage != 'DONE':
+                print(status._instr.name + ' in ' +  status._stage + ' stage')
+                pending_queue.appendleft(status)
+            else:
+                print(status._instr.name + ' done with WB stage')
+
+        if STAGE['IF'] == 0:
+            instr = INSTRUCTIONS[instr_count]
+            print(instr.name + ' in IF stage')
+            pending_queue.appendleft(Status(instr))
+            STAGE['IF'] = 1
+            instr_count += 1
+
+        if instr.name == 'HLT':
+            break;
+
+        clock_cycle += 1
+
 
 
 def main():
     parse('inst.txt')
     parse_registers('reg.txt')
     parse_data('data.txt')
+    simulate_run()
 
 
 if  __name__ == '__main__':
