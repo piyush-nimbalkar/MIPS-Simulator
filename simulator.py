@@ -1,4 +1,8 @@
+DATA = {}
+REGISTER = {}
 WORD_SIZE = 4
+MEMORY_BASE_ADDRESS = 256
+
 
 
 class Instruction:
@@ -99,9 +103,7 @@ def parse(filename):
         print
 
 
-REGISTER = {}
-
-def parse_reg(filename):
+def parse_registers(filename):
     file = open(filename, 'r')
     reg_count = 0
 
@@ -117,9 +119,26 @@ def parse_reg(filename):
     print(REGISTER)
 
 
+def parse_data(filename):
+    file = open(filename, 'r')
+    word_count = 0
+
+    for line in file:
+        value = 0
+        count = (WORD_SIZE * 8) - 1
+        for i in line.strip():
+            value += pow(2, count) * int(i)
+            count -= 1
+        DATA[MEMORY_BASE_ADDRESS + word_count] = value
+        word_count += 1
+
+    print(DATA)
+
+
 def main():
     parse('inst.txt')
-    parse_reg('reg.txt')
+    parse_registers('reg.txt')
+    parse_data('data.txt')
 
 
 if  __name__ == '__main__':
