@@ -13,10 +13,6 @@ class Instruction:
         self.func_unit = self.__functional_unit(instr_name)
         self.__store_registers(instr_name, operands)
         self.address = Instruction.count * WORD_SIZE
-        self._IF = 0
-        self._ID = 0
-        self._EX = 0
-        self._WB = 0
         Instruction.count += 1
 
 
