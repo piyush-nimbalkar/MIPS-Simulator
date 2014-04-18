@@ -49,6 +49,29 @@ def parse_data(filename):
         word_count += 1
 
 
+def parse_config(filename):
+    file = open(filename, 'r')
+
+    for line in file:
+        line = line.lower().strip()
+        split_line = line.split(':')
+        if 'adder' in split_line[0]:
+            write_pipelining_status(FP_ADD, split_line[1])
+        elif 'multiplier' in split_line[0]:
+            write_pipelining_status(FP_MUL, split_line[1])
+        elif 'divider' in split_line[0]:
+            write_pipelining_status(FP_DIV, split_line[1])
+
+
+def write_pipelining_status(fu_hash, param_string):
+    params = [x.strip() for x in param_string.split(',')]
+    fu_hash['CYCLES'] = int(params[0])
+    if params[1] == 'yes':
+        fu_hash['PIPELINED'] = True
+    else:
+        fu_hash['PIPELINED'] = False
+
+
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
@@ -78,4 +101,5 @@ if  __name__ == '__main__':
     parse('inst.txt')
     parse_registers('reg.txt')
     parse_data('data.txt')
+    parse_config('config.txt')
     simulate_run()
