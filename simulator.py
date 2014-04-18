@@ -11,7 +11,7 @@ def parse(filename):
     for line in file:
         instruction = filter(None, line.strip().split(' '))
         if ':' in instruction[0]:
-            labels[instruction[0].strip(':')] = Instruction.count * WORD_SIZE
+            labels[instruction[0].strip(':').upper()] = Instruction.count * WORD_SIZE
             INSTRUCTIONS.append(Instruction(instruction[1], instruction[2:len(instruction)]))
         else:
             INSTRUCTIONS.append(Instruction(instruction[0], instruction[1:len(instruction)]))
