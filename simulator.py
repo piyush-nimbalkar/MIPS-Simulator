@@ -52,25 +52,12 @@ def parse_data(filename):
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
+    instruction_count = 1
 
-    for new_instruction in INSTRUCTIONS:
-        print('\nCycle -------- ' + str(clock_cycle))
-        for i in range(0, len(instruction_queue)):
-            instruction = instruction_queue.pop()
-            instruction.current_stage = instruction.current_stage.next()
-            instruction.continue_execution()
-
-            if instruction.current_stage != Executable.write_back:
-                instruction_queue.appendleft(instruction)
-
-        if STAGE['IF'] == 0:
-            instruction_queue.appendleft(Executable(new_instruction))
-
-        clock_cycle += 1
-
+    instruction_queue.appendleft(Executable(INSTRUCTIONS[0]))
 
     while len(instruction_queue) > 0:
-        print('\nCycle -------- ' + str(clock_cycle))
+        print('------- End of Clock Cycle %s -------\n' % str(clock_cycle))
         for i in range(0, len(instruction_queue)):
             instruction = instruction_queue.pop()
             instruction.current_stage = instruction.current_stage.next()
@@ -78,6 +65,10 @@ def simulate_run():
 
             if instruction.current_stage != Executable.write_back:
                 instruction_queue.appendleft(instruction)
+
+        if STAGE['IF'] == 0 and instruction_count < len(INSTRUCTIONS):
+            instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count]))
+            instruction_count += 1
 
         clock_cycle += 1
 
