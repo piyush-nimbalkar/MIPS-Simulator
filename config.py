@@ -22,6 +22,11 @@ STAGE = {
     'WB': FREE
 }
 
+INTEGER = {
+    'CYCLES': 2,
+    'PIPELINED': True
+}
+
 FP_ADD = {
     'CYCLES': 4,
     'PIPELINED': False

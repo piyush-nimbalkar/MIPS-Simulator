@@ -56,7 +56,7 @@ class DecodeStage(Stage):
 class ExecuteStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
-        self.cycles = 2
+        self.cycles = INTEGER['CYCLES']
         self.name = 'EX'
 
     def run(self, instruction):
@@ -74,7 +74,7 @@ class ExecuteStage(Stage):
 class FPAddStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
-        self.cycles = 4
+        self.cycles = FP_ADD['CYCLES']
         self.name = 'EX'
 
     def run(self, instruction):
@@ -92,7 +92,7 @@ class FPAddStage(ExecuteStage):
 class FPMulStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
-        self.cycles = 6
+        self.cycles = FP_MUL['CYCLES']
         self.name = 'EX'
 
     def run(self, instruction):
@@ -110,7 +110,7 @@ class FPMulStage(ExecuteStage):
 class FPDivStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
-        self.cycles = 20
+        self.cycles = FP_DIV['CYCLES']
         self.name = 'EX'
 
     def run(self, instruction):
