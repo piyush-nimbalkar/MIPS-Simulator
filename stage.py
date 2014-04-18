@@ -5,6 +5,7 @@ import executable
 class Stage: pass
 
 
+
 class FetchStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
@@ -18,6 +19,7 @@ class FetchStage(Stage):
             STAGE['IF'] = False
             return DecodeStage(self.instruction)
         return self
+
 
 
 class DecodeStage(Stage):
@@ -35,10 +37,11 @@ class DecodeStage(Stage):
         return self
 
 
+
 class ExecuteStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
-        self.cycles = 3
+        self.cycles = self.__calculate_cycles()
 
     def run(self, instruction):
         STAGE['EX'] = True
@@ -50,6 +53,20 @@ class ExecuteStage(Stage):
             STAGE['EX'] = False
             return executable.Executable.write_back
         return self
+
+    def __calculate_cycles(self):
+        func_unit = self.instruction.func_unit
+        if func_unit == 'FP_ADD':
+            return 4
+        elif func_unit == 'FP_MUL':
+            return 6
+        elif func_unit == 'FP_DIV':
+            return 20
+        elif func_unit == 'INTEGER':
+            return 2
+        else:
+            return 1
+
 
 
 class WriteBackStage(Stage):
