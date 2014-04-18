@@ -2,32 +2,38 @@ from config import *
 import executable
 
 
-class Stage:
-    def run(self, instruction):
-        assert 0, "run not implemented"
-
-    def next(self, input):
-        assert 0, "next not implemented"
+class Stage: pass
 
 
 class FetchStage(Stage):
+    def __init__(self, instruction):
+        self.instruction = instruction
+
     def run(self, instruction):
         STAGE['IF'] = 1
-        print(instruction.name + ' in IF')
+        print(self.instruction.name + ' in IF')
 
     def next(self):
-        return executable.Executable.decode
+        return DecodeStage(self.instruction)
+
 
 class DecodeStage(Stage):
+    def __init__(self, instruction):
+        self.instruction = instruction
+
     def run(self, instruction):
         STAGE['IF'] = 0
         STAGE['ID'] = 1
         print(instruction.name + ' in ID')
 
     def next(self):
-        return executable.Executable.execute
+        return ExecuteStage(self.instruction)
+
 
 class ExecuteStage(Stage):
+    def __init__(self, instruction):
+        self.instruction = instruction
+
     def run(self, instruction):
         STAGE['ID'] = 0
         STAGE['EX'] = 1
@@ -36,6 +42,7 @@ class ExecuteStage(Stage):
     def next(self):
         return executable.Executable.write_back
 
+
 class WriteBackStage(Stage):
     def run(self, instruction):
         STAGE['EX'] = 0
@@ -43,4 +50,4 @@ class WriteBackStage(Stage):
         print(instruction.name + ' in WB!  \m/')
 
     def next(self):
-        return executable.Executable.done
+        return None
