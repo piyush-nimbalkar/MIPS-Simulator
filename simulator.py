@@ -60,12 +60,8 @@ def simulate_run():
         print('------- End of Clock Cycle %s -------\n' % str(clock_cycle))
         for i in range(0, len(instruction_queue)):
             instruction = instruction_queue.pop()
-            instruction.continue_execution()
-
-            if instruction.current_stage != Executable.write_back:
+            if instruction.continue_execution():
                 instruction_queue.appendleft(instruction)
-            else:
-                instruction.current_stage.next()
 
         if STAGE['IF'] == 0 and instruction_count < len(INSTRUCTIONS):
             instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count]))
