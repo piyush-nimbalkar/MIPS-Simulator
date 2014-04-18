@@ -10,8 +10,8 @@ Label: LW     R1, 30(R2)
 Blah:  AND    R1, R2, R3
        ANDI   R1, R2, 43
        OR     R1, R2, R3
-       ORI    R1, R2, 43
        ADD.D  F1, F2, F3
+       ORI    R1, R2, 43
        SUB.D  F1, F2, F3
        MUL.D  F1, F2, F3
        DIV.D  F1, F2, F3

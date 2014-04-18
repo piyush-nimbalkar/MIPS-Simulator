@@ -64,7 +64,7 @@ class ExecuteStage(Stage):
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == FREE:
+        if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['INTEGER'] = FREE
             return executable.Executable.write_back
         return self
@@ -82,7 +82,7 @@ class FPAddStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == FREE:
+        if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_ADD'] = FREE
             return executable.Executable.write_back
         return self
@@ -100,7 +100,7 @@ class FPMulStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == FREE:
+        if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_MUL'] = FREE
             return executable.Executable.write_back
         return self
@@ -118,7 +118,7 @@ class FPDivStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == FREE:
+        if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_DIV'] = FREE
             return executable.Executable.write_back
         return self
