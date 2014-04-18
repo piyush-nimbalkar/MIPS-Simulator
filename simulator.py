@@ -80,12 +80,21 @@ def simulate_run():
     instruction_queue.appendleft(Executable(INSTRUCTIONS[0], clock_cycle))
 
     while len(instruction_queue) > 0:
-        for i in range(0, len(instruction_queue)):
-            instruction = instruction_queue.pop()
-            if instruction.continue_execution():
-                instruction_queue.appendleft(instruction)
-            else:
-                result.append(instruction.result)
+        queue_size = len(instruction_queue)
+        for stage in ['WB', 'EX', 'ID', 'IF']:
+            for i in range(0, len(instruction_queue)):
+                instruction = instruction_queue.pop()
+                if instruction.current_stage.name == stage:
+                    if instruction.continue_execution():
+                        instruction_queue.appendleft(instruction)
+                    else:
+                        result.append(instruction.result)
+                    queue_size -= 1
+                else:
+                    instruction_queue.appendleft(instruction)
+            if queue_size == 0:
+                break
+
         clock_cycle += 1
 
         if STAGE['IF'] == FREE and instruction_count < len(INSTRUCTIONS):
