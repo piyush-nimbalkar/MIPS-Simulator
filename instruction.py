@@ -37,7 +37,7 @@ class Instruction:
         elif name in ['J', 'BNE', 'BEQ', 'HLT']:
             return 'NONE'
         else:
-            return 'INTEGER'
+            return 'IU'
 
 
     def __store_registers(self, name, operands):

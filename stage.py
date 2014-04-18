@@ -56,16 +56,30 @@ class DecodeStage(Stage):
 class ExecuteStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
-        self.cycles = INTEGER['CYCLES']
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['INTEGER'] = BUSY
-        self.cycles -= 1
+        STAGE['IU'] = BUSY
 
     def next(self):
-        if self.cycles <= 0 and STAGE['WB'] == FREE:
-            STAGE['INTEGER'] = FREE
+        if STAGE['MEM'] == FREE:
+            STAGE['IU'] = FREE
+            return MemoryStage(self.instruction)
+        return self
+
+
+
+class MemoryStage(Stage):
+    def __init__(self, instruction):
+        self.instruction = instruction
+        self.name = 'EX'
+
+    def run(self, instruction):
+        STAGE['MEM'] = BUSY
+
+    def next(self):
+        if STAGE['WB'] == FREE:
+            STAGE['MEM'] = FREE
             return executable.Executable.write_back
         return self
 

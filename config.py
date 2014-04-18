@@ -15,17 +15,14 @@ FREE = False
 STAGE = {
     'IF': FREE,
     'ID': FREE,
-    'INTEGER': FREE,
+    'IU': FREE,
+    'MEM': FREE,
     'FP_ADD': FREE,
     'FP_MUL': FREE,
     'FP_DIV': FREE,
     'WB': FREE
 }
 
-INTEGER = {
-    'CYCLES': 2,
-    'PIPELINED': True
-}
 
 FP_ADD = {
     'CYCLES': 4,
