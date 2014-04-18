@@ -64,6 +64,8 @@ def simulate_run():
 
             if instruction.current_stage != Executable.write_back:
                 instruction_queue.appendleft(instruction)
+            else:
+                instruction.current_stage.next()
 
         if STAGE['IF'] == 0 and instruction_count < len(INSTRUCTIONS):
             instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count]))
