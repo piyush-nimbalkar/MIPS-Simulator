@@ -78,10 +78,13 @@ class FPAddStage(ExecuteStage):
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['FP_ADD'] = BUSY
+        if self.cycles == FP_ADD['CYCLES']:
+            STAGE['FP_ADD'] = BUSY
         self.cycles -= 1
 
     def next(self):
+        if FP_ADD['PIPELINED']:
+            STAGE['FP_ADD'] = FREE
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_ADD'] = FREE
             return executable.Executable.write_back
