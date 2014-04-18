@@ -3,12 +3,14 @@ REGISTER = {}
 WORD_SIZE = 4
 MEMORY_BASE_ADDRESS = 256
 INSTRUCTIONS = []
+BUSY = True
+FREE = False
 STAGE = {
-    'IF': False,
-    'ID': False,
-    'INTEGER': False,
-    'FP_ADD': False,
-    'FP_MUL': False,
-    'FP_DIV': False,
-    'WB': False
+    'IF': FREE,
+    'ID': FREE,
+    'INTEGER': FREE,
+    'FP_ADD': FREE,
+    'FP_MUL': FREE,
+    'FP_DIV': FREE,
+    'WB': FREE
 }

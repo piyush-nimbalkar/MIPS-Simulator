@@ -12,11 +12,11 @@ class FetchStage(Stage):
         self.name = 'IF'
 
     def run(self, instruction):
-        STAGE['IF'] = True
+        STAGE['IF'] = BUSY
 
     def next(self):
-        if STAGE['ID'] == False:
-            STAGE['IF'] = False
+        if STAGE['ID'] == FREE:
+            STAGE['IF'] = FREE
             return DecodeStage(self.instruction)
         return self
 
@@ -28,15 +28,15 @@ class DecodeStage(Stage):
         self.name = 'ID'
 
     def run(self, instruction):
-        STAGE['ID'] = True
+        STAGE['ID'] = BUSY
 
     def next(self):
         func_unit = self.instruction.func_unit
         if func_unit == 'NONE':
-            STAGE['ID'] = False
+            STAGE['ID'] = FREE
             return None
-        if STAGE[func_unit] == False:
-            STAGE['ID'] = False
+        if STAGE[func_unit] == FREE:
+            STAGE['ID'] = FREE
             return self.__execution_stage()
         return self
 
@@ -60,12 +60,12 @@ class ExecuteStage(Stage):
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['INTEGER'] = True
+        STAGE['INTEGER'] = BUSY
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == False:
-            STAGE['INTEGER'] = False
+        if self.cycles == 0 and STAGE['WB'] == FREE:
+            STAGE['INTEGER'] = FREE
             return executable.Executable.write_back
         return self
 
@@ -78,12 +78,12 @@ class FPAddStage(ExecuteStage):
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['FP_ADD'] = True
+        STAGE['FP_ADD'] = BUSY
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == False:
-            STAGE['FP_ADD'] = False
+        if self.cycles == 0 and STAGE['WB'] == FREE:
+            STAGE['FP_ADD'] = FREE
             return executable.Executable.write_back
         return self
 
@@ -96,12 +96,12 @@ class FPMulStage(ExecuteStage):
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['FP_MUL'] = True
+        STAGE['FP_MUL'] = BUSY
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == False:
-            STAGE['FP_MUL'] = False
+        if self.cycles == 0 and STAGE['WB'] == FREE:
+            STAGE['FP_MUL'] = FREE
             return executable.Executable.write_back
         return self
 
@@ -114,12 +114,12 @@ class FPDivStage(ExecuteStage):
         self.name = 'EX'
 
     def run(self, instruction):
-        STAGE['FP_DIV'] = True
+        STAGE['FP_DIV'] = BUSY
         self.cycles -= 1
 
     def next(self):
-        if self.cycles == 0 and STAGE['WB'] == False:
-            STAGE['FP_DIV'] = False
+        if self.cycles == 0 and STAGE['WB'] == FREE:
+            STAGE['FP_DIV'] = FREE
             return executable.Executable.write_back
         return self
 
@@ -130,8 +130,8 @@ class WriteBackStage(Stage):
         self.name = 'WB'
 
     def run(self, instruction):
-        STAGE['WB'] = True
+        STAGE['WB'] = BUSY
 
     def next(self):
-        STAGE['WB'] = False
+        STAGE['WB'] = FREE
         return None

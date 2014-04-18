@@ -65,7 +65,7 @@ def simulate_run():
                 result.append(instruction.result)
         clock_cycle += 1
 
-        if STAGE['IF'] == 0 and instruction_count < len(INSTRUCTIONS):
+        if STAGE['IF'] == FREE and instruction_count < len(INSTRUCTIONS):
             instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count], clock_cycle))
             instruction_count += 1
 
