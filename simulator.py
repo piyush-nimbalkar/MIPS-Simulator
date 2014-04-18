@@ -53,21 +53,25 @@ def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
     instruction_count = 1
-
-    instruction_queue.appendleft(Executable(INSTRUCTIONS[0]))
+    result = []
+    instruction_queue.appendleft(Executable(INSTRUCTIONS[0], clock_cycle))
 
     while len(instruction_queue) > 0:
-        print('------- End of Clock Cycle %s -------\n' % str(clock_cycle))
         for i in range(0, len(instruction_queue)):
             instruction = instruction_queue.pop()
             if instruction.continue_execution():
                 instruction_queue.appendleft(instruction)
+            else:
+                result.append(instruction.result)
+        clock_cycle += 1
 
         if STAGE['IF'] == 0 and instruction_count < len(INSTRUCTIONS):
-            instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count]))
+            instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count], clock_cycle))
             instruction_count += 1
 
-        clock_cycle += 1
+    for row in sorted(result, key=lambda x: x.IF_cycle):
+        row.display()
+
 
 
 if  __name__ == '__main__':
