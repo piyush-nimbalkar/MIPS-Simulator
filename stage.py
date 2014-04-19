@@ -59,6 +59,8 @@ class ExecuteStage(Stage):
         self.name = 'EX'
 
     def run(self, instruction):
+        if STAGE['IU'] != BUSY:
+            self.__execute()
         STAGE['IU'] = BUSY
 
     def next(self):
@@ -67,12 +69,32 @@ class ExecuteStage(Stage):
             return MemoryStage(self.instruction)
         return self
 
+    def __execute(self):
+        instr = self.instruction
+        if instr.name == 'LW':
+            REGISTER[instr.dest_reg] = DATA[REGISTER[instr.src_reg[0]] + int(instr.offset)]
+        elif instr.name == 'DADD':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] + REGISTER[instr.src_reg[1]]
+        elif instr.name == 'DADDI':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] + int(instr.immediate)
+        elif instr.name == 'DSUB':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] - REGISTER[instr.src_reg[1]]
+        elif instr.name == 'DSUBI':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] - int(instr.immediate)
+        elif instr.name == 'AND':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] & REGISTER[instr.src_reg[1]]
+        elif instr.name == 'ANDI':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] & int(instr.immediate)
+        elif instr.name == 'OR':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] | REGISTER[instr.src_reg[1]]
+        elif instr.name == 'ORI':
+            REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] | int(instr.immediate)
 
 
-class MemoryStage(Stage):
+
+class MemoryStage(ExecuteStage):
     def __init__(self, instruction):
-        self.instruction = instruction
-        self.name = 'EX'
+        ExecuteStage.__init__(self, instruction)
 
     def run(self, instruction):
         STAGE['MEM'] = BUSY
@@ -89,7 +111,6 @@ class FPAddStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
         self.cycles = FP_ADD['CYCLES']
-        self.name = 'EX'
 
     def run(self, instruction):
         if self.cycles == FP_ADD['CYCLES']:
@@ -110,7 +131,6 @@ class FPMulStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
         self.cycles = FP_MUL['CYCLES']
-        self.name = 'EX'
 
     def run(self, instruction):
         STAGE['FP_MUL'] = BUSY
@@ -128,7 +148,6 @@ class FPDivStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
         self.cycles = FP_DIV['CYCLES']
-        self.name = 'EX'
 
     def run(self, instruction):
         STAGE['FP_DIV'] = BUSY

@@ -1,8 +1,8 @@
-Label: LW     R1, 30(R2)
-       SW     R3, 500(R4)
+Label: LW     R1, 256(R2)
+       SW     R3, 265(R4)
        J      Blah
-       L.D    F1, 30(R2)
-       S.D    F3, 500(R4)
+       L.D    F1, 263(R2)
+       S.D    F3, 265(R4)
        DADD   R1, R2, R3
        DADDI  R2, R2, 43
        DSUB   R1, R2, R3
