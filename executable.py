@@ -13,10 +13,14 @@ class Executable():
 
     def continue_execution(self):
         previous_stage = self.current_stage
-        self.current_stage, struct_hazard = previous_stage.next()
+        self.current_stage, hazard = previous_stage.next()
 
-        if struct_hazard:
+        if hazard.struct:
             self.result.struct_hazard = True
+        if hazard.raw:
+            self.result.raw_hazard = True
+        if hazard.waw:
+            self.result.waw_hazard = True
 
         if self.current_stage == None:
             return False

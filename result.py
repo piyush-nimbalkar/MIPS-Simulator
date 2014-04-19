@@ -6,6 +6,8 @@ class Result:
         self.EX_cycle = 0
         self.WB_cycle = 0
         self.struct_hazard = False
+        self.raw_hazard = False
+        self.waw_hazard = False
 
 
     def display(self):
