@@ -25,17 +25,19 @@ class Result:
         else:
             print('-\t'),
 
-        if self.struct_hazard:
-            print('Y\t'),
-        else:
-            print('N\t'),
-
         if self.raw_hazard:
-            print('Y\t'),
+            print(' Y\t'),
         else:
-            print('N\t'),
+            print(' -\t'),
+
+        print(' -\t'),
 
         if self.waw_hazard:
-            print('Y')
+            print(' Y\t'),
         else:
-            print('N')
+            print(' -\t'),
+
+        if self.struct_hazard:
+            print(' Y')
+        else:
+            print(' -')
