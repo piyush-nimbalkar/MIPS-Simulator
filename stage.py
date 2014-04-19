@@ -141,12 +141,15 @@ class FPMulStage(ExecuteStage):
         self.cycles = FP_MUL['CYCLES']
 
     def run(self, instruction):
-        STAGE['FP_MUL'] = BUSY
+        if self.cycles == FP_MUL['CYCLES']:
+            STAGE['FP_MUL'] = BUSY
         self.cycles -= 1
 
     def next(self):
         if self.cycles < 0:
             self.struct_hazard = True
+        if FP_MUL['PIPELINED']:
+            STAGE['FP_MUL'] = FREE
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_MUL'] = FREE
             return executable.Executable.write_back, self.struct_hazard
@@ -160,12 +163,15 @@ class FPDivStage(ExecuteStage):
         self.cycles = FP_DIV['CYCLES']
 
     def run(self, instruction):
-        STAGE['FP_DIV'] = BUSY
+        if self.cycles == FP_DIV['CYCLES']:
+            STAGE['FP_DIV'] = BUSY
         self.cycles -= 1
 
     def next(self):
         if self.cycles < 0:
             self.struct_hazard = True
+        if FP_DIV['PIPELINED']:
+            STAGE['FP_DIV'] = FREE
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_DIV'] = FREE
             return executable.Executable.write_back, self.struct_hazard
