@@ -10,6 +10,7 @@ class FetchStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
         self.name = 'IF'
+        self.struct_hazard = False
 
     def run(self, instruction):
         STAGE['IF'] = BUSY
@@ -17,8 +18,8 @@ class FetchStage(Stage):
     def next(self):
         if STAGE['ID'] == FREE:
             STAGE['IF'] = FREE
-            return DecodeStage(self.instruction)
-        return self
+            return DecodeStage(self.instruction), self.struct_hazard
+        return self, self.struct_hazard
 
 
 
@@ -26,6 +27,7 @@ class DecodeStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
         self.name = 'ID'
+        self.struct_hazard = False
 
     def run(self, instruction):
         STAGE['ID'] = BUSY
@@ -34,11 +36,12 @@ class DecodeStage(Stage):
         func_unit = self.instruction.func_unit
         if func_unit == 'NONE':
             STAGE['ID'] = FREE
-            return None
+            return None, self.struct_hazard
         if STAGE[func_unit] == FREE:
             STAGE['ID'] = FREE
-            return self.__execution_stage()
-        return self
+            return self.__execution_stage(), self.struct_hazard
+        self.struct_hazard = True
+        return self, self.struct_hazard
 
     def __execution_stage(self):
         func_unit = self.instruction.func_unit
@@ -57,6 +60,7 @@ class ExecuteStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
         self.name = 'EX'
+        self.struct_hazard = False
 
     def run(self, instruction):
         if STAGE['IU'] != BUSY:
@@ -66,8 +70,9 @@ class ExecuteStage(Stage):
     def next(self):
         if STAGE['MEM'] == FREE:
             STAGE['IU'] = FREE
-            return MemoryStage(self.instruction)
-        return self
+            return MemoryStage(self.instruction), self.struct_hazard
+        self.struct_hazard = True
+        return self, self.struct_hazard
 
     def __execute(self):
         instr = self.instruction
@@ -102,8 +107,9 @@ class MemoryStage(ExecuteStage):
     def next(self):
         if STAGE['WB'] == FREE:
             STAGE['MEM'] = FREE
-            return executable.Executable.write_back
-        return self
+            return executable.Executable.write_back, self.struct_hazard
+        self.struct_hazard = True
+        return self, self.struct_hazard
 
 
 
@@ -118,12 +124,14 @@ class FPAddStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
+        if self.cycles < 0:
+            self.struct_hazard = True
         if FP_ADD['PIPELINED']:
             STAGE['FP_ADD'] = FREE
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_ADD'] = FREE
-            return executable.Executable.write_back
-        return self
+            return executable.Executable.write_back, self.struct_hazard
+        return self, self.struct_hazard
 
 
 
@@ -137,10 +145,12 @@ class FPMulStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
+        if self.cycles < 0:
+            self.struct_hazard = True
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_MUL'] = FREE
-            return executable.Executable.write_back
-        return self
+            return executable.Executable.write_back, self.struct_hazard
+        return self, self.struct_hazard
 
 
 
@@ -154,20 +164,23 @@ class FPDivStage(ExecuteStage):
         self.cycles -= 1
 
     def next(self):
+        if self.cycles < 0:
+            self.struct_hazard = True
         if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['FP_DIV'] = FREE
-            return executable.Executable.write_back
-        return self
+            return executable.Executable.write_back, self.struct_hazard
+        return self, self.struct_hazard
 
 
 
 class WriteBackStage(Stage):
     def __init__(self):
         self.name = 'WB'
+        self.struct_hazard = False
 
     def run(self, instruction):
         STAGE['WB'] = BUSY
 
     def next(self):
         STAGE['WB'] = FREE
-        return None
+        return None, self.struct_hazard

@@ -5,6 +5,7 @@ class Result:
         self.ID_cycle = 0
         self.EX_cycle = 0
         self.WB_cycle = 0
+        self.struct_hazard = False
 
 
     def display(self):
@@ -18,6 +19,11 @@ class Result:
             print('-\t'),
 
         if self.WB_cycle != 0:
-            print(str(self.WB_cycle))
+            print(str(self.WB_cycle) + '\t'),
         else:
-            print('-')
+            print('-\t'),
+
+        if self.struct_hazard:
+            print('Y')
+        else:
+            print('N')
