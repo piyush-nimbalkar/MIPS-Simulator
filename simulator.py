@@ -72,6 +72,12 @@ def write_pipelining_status(fu_hash, param_string):
         fu_hash['PIPELINED'] = False
 
 
+def reset_register_status():
+    for i in range(32):
+        REGISTER_STATUS['R' + str(i)] = FREE
+        REGISTER_STATUS['F' + str(i)] = FREE
+
+
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
@@ -111,4 +117,5 @@ if  __name__ == '__main__':
     parse_registers('reg.txt')
     parse_data('data.txt')
     parse_config('config.txt')
+    reset_register_status()
     simulate_run()

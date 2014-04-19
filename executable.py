@@ -43,7 +43,3 @@ class Executable():
             self.result.EX_cycle += 1
         elif previous_stage.name == 'EX' and current_stage.name == 'WB':
             self.result.WB_cycle = self.result.EX_cycle + 1
-
-
-
-Executable.write_back = stage.WriteBackStage()
