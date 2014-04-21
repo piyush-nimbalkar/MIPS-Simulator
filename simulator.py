@@ -111,7 +111,7 @@ def simulate_run():
     print('Instr\tIF\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct')
     print('-' * 70)
     for row in sorted(result, key=lambda x: x.IF_cycle):
-        row.display()
+        print(row)
     print('-' * 70)
 
 

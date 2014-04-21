@@ -10,34 +10,36 @@ class Result:
         self.waw_hazard = False
 
 
-    def display(self):
-        print(self.instruction.name + '\t'),
-        print(str(self.IF_cycle) + '\t'),
-        print(str(self.ID_cycle) + '\t'),
+    def __str__(self):
+        string = self.instruction.name + '\t'
+        string += str(self.IF_cycle) + '\t'
+        string += str(self.ID_cycle) + '\t'
 
         if self.EX_cycle != 0:
-            print(str(self.EX_cycle) + '\t'),
+            string += str(self.EX_cycle) + '\t'
         else:
-            print('-\t'),
+            string += '-\t'
 
         if self.WB_cycle != 0:
-            print(str(self.WB_cycle) + '\t'),
+            string += str(self.WB_cycle) + '\t'
         else:
-            print('-\t'),
+            string += '-\t'
 
         if self.raw_hazard:
-            print(' Y\t'),
+            string += ' Y\t'
         else:
-            print(' -\t'),
+            string += ' -\t'
 
-        print(' -\t'),
+        string += ' -\t'
 
         if self.waw_hazard:
-            print(' Y\t'),
+            string += ' Y\t'
         else:
-            print(' -\t'),
+            string += ' -\t'
 
         if self.struct_hazard:
-            print(' Y')
+            string += ' Y'
         else:
-            print(' -')
+            string += ' -'
+
+        return string
