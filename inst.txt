@@ -1,21 +1,13 @@
-Label: LW     R1, 256(R2)
-       SW     R3, 265(R4)
-       J      Blah
-       L.D    F1, 263(R2)
-       S.D    F3, 265(R4)
-       DADD   R1, R2, R3
-       DADDI  R2, R2, 43
-       DSUB   R1, R2, R3
-       DSUBI  R1, R2, 43
-Blah:  AND    R1, R2, R3
-       ANDI   R1, R2, 43
-       OR     R1, R2, R3
-       ADD.D  F1, F2, F3
-       ORI    R1, R2, 43
-       SUB.D  F1, F2, F3
-       MUL.D  F1, F2, F3
-       DIV.D  F1, F2, F3
-       J      Blah
-       BNE    R3, R4, Label
-       BEQ    R3, R4, Label
-       HLT
+GG: L.D F1, 4(R4)
+    L.D F2, 8(R5)
+    ADD.D   F4, F6, F2
+    SUB.D   F5, F7, F1
+    MUL.D   F6, F1, F5
+    ADD.D   F7, F2, F6
+    ADD.D   F6, F1, F7
+    DADDI   R4, R4, 2
+    DADDI   R5, R5, 2
+    DSUB    R1, R1, R2
+    BNE     R1, R3, GG
+    HLT
+    HLT
