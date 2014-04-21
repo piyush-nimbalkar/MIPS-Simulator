@@ -11,7 +11,7 @@ class Result:
 
 
     def __str__(self):
-        string = self.instruction.name + '\t'
+        string = '%-24s' % str(self.instruction)
         string += str(self.IF_cycle) + '\t'
         string += str(self.ID_cycle) + '\t'
 

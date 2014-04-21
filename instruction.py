@@ -8,12 +8,17 @@ class Instruction:
     count = 0
 
     def __init__(self, instr_name, operands):
+        self._full_name = instr_name  + ' ' + ' '.join(operands)
         self.name = instr_name.upper()
         self.type = self.__instruction_type(self.name)
         self.func_unit = self.__functional_unit(self.name)
         self.__store_registers(self.name, operands)
         self.address = Instruction.count * WORD_SIZE
         Instruction.count += 1
+
+
+    def __str__(self):
+        return self._full_name
 
 
     def __instruction_type(self, name):

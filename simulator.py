@@ -107,12 +107,13 @@ def simulate_run():
             instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count], clock_cycle))
             instruction_count += 1
 
-    print('-' * 70)
-    print('Instr\tIF\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct')
-    print('-' * 70)
+
+    print('-' * 86)
+    print('INSTRUCTION\t\tIF\tID\tEX\tWB\tRAW\tWAR\tWAW\tSTRUCT')
+    print('-' * 86)
     for row in sorted(result, key=lambda x: x.IF_cycle):
         print(row)
-    print('-' * 70)
+        print('-' * 86)
 
 
 
