@@ -9,12 +9,17 @@ def parse(filename):
     labels = {}
 
     for line in file:
-        instruction = filter(None, line.strip().split(' '))
-        if ':' in instruction[0]:
-            labels[instruction[0].strip(':').upper()] = Instruction.count * WORD_SIZE
-            INSTRUCTIONS.append(Instruction(instruction[1], instruction[2:len(instruction)]))
+        line = line.strip().upper()
+        if ':' in line:
+            instruction = line.split(':')
+            labels[instruction[0].strip().upper()] = Instruction.count * WORD_SIZE
+            instruction = instruction[1].strip().split(' ')
         else:
-            INSTRUCTIONS.append(Instruction(instruction[0], instruction[1:len(instruction)]))
+            instruction = line.split(' ')
+
+        instruction_name = instruction[0]
+        operands = ''.join(instruction[1 : len(instruction)]).split(',')
+        INSTRUCTIONS.append(Instruction(instruction_name, operands))
 
     for instr in INSTRUCTIONS:
         if instr.immediate in labels.keys():
