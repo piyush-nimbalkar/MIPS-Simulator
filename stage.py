@@ -34,18 +34,17 @@ class DecodeStage(Stage):
         STAGE['ID'] = BUSY
 
     def next(self):
-        func_unit = self.instruction.func_unit
-        self.__detect_hazard(func_unit)
-        if func_unit == 'NONE' and not self.__is_hazard():
+        func_unit = self.instruction.functional_unit()
+        self._detect_hazard(func_unit)
+        if func_unit == 'NONE' and not self._is_hazard():
             STAGE['ID'] = FREE
             return None, self.hazard
-        if func_unit != 'NONE' and STAGE[func_unit] == FREE and not self.__is_hazard():
+        if func_unit != 'NONE' and STAGE[func_unit] == FREE and not self._is_hazard():
             STAGE['ID'] = FREE
-            return self.__execution_stage(), self.hazard
+            return self._execution_stage(func_unit), self.hazard
         return self, self.hazard
 
-    def __execution_stage(self):
-        func_unit = self.instruction.func_unit
+    def _execution_stage(self, func_unit):
         if func_unit == 'FP_ADD':
             return FPAddStage(self.instruction)
         elif func_unit == 'FP_MUL':
@@ -55,7 +54,7 @@ class DecodeStage(Stage):
         else:
             return ExecuteStage(self.instruction)
 
-    def __detect_hazard(self, func_unit):
+    def _detect_hazard(self, func_unit):
         if self.instruction.dest_reg != '' and REGISTER_STATUS[self.instruction.dest_reg] == BUSY:
             self.hazard.waw = True
         for reg in self.instruction.src_reg:
@@ -64,7 +63,7 @@ class DecodeStage(Stage):
         if func_unit != 'NONE' and STAGE[func_unit] == BUSY:
             self.hazard.struct = True
 
-    def __is_hazard(self):
+    def _is_hazard(self):
         if self.instruction.dest_reg != '' and REGISTER_STATUS[self.instruction.dest_reg] == BUSY:
             return True
         for reg in self.instruction.src_reg:
@@ -81,8 +80,8 @@ class ExecuteStage(Stage):
 
     def run(self, instruction):
         if STAGE['IU'] != BUSY:
-            self.__block_register()
-            self.__execute()
+            self._block_register()
+            self._execute()
         STAGE['IU'] = BUSY
 
     def next(self):
@@ -92,7 +91,7 @@ class ExecuteStage(Stage):
         self.hazard.struct = True
         return self, self.hazard
 
-    def __execute(self):
+    def _execute(self):
         instr = self.instruction
         if instr.name == 'LW':
             REGISTER[instr.dest_reg] = DATA[REGISTER[instr.src_reg[0]] + int(instr.offset)]
@@ -113,7 +112,7 @@ class ExecuteStage(Stage):
         elif instr.name == 'ORI':
             REGISTER[instr.dest_reg] = REGISTER[instr.src_reg[0]] | int(instr.immediate)
 
-    def __block_register(self):
+    def _block_register(self):
         if self.instruction.dest_reg != '':
             REGISTER_STATUS[self.instruction.dest_reg] = BUSY
 
@@ -142,7 +141,7 @@ class FPAddStage(ExecuteStage):
 
     def run(self, instruction):
         if self.cycles == FP_ADD['CYCLES']:
-            self.__block_register()
+            self._block_register()
             STAGE['FP_ADD'] = BUSY
         self.cycles -= 1
 
@@ -156,7 +155,7 @@ class FPAddStage(ExecuteStage):
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
 
-    def __block_register(self):
+    def _block_register(self):
         if self.instruction.dest_reg != '':
             REGISTER_STATUS[self.instruction.dest_reg] = BUSY
 
@@ -169,7 +168,7 @@ class FPMulStage(ExecuteStage):
 
     def run(self, instruction):
         if self.cycles == FP_MUL['CYCLES']:
-            self.__block_register()
+            self._block_register()
             STAGE['FP_MUL'] = BUSY
         self.cycles -= 1
 
@@ -183,7 +182,7 @@ class FPMulStage(ExecuteStage):
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
 
-    def __block_register(self):
+    def _block_register(self):
         if self.instruction.dest_reg != '':
             REGISTER_STATUS[self.instruction.dest_reg] = BUSY
 
@@ -196,7 +195,7 @@ class FPDivStage(ExecuteStage):
 
     def run(self, instruction):
         if self.cycles == FP_DIV['CYCLES']:
-            self.__block_register()
+            self._block_register()
             STAGE['FP_DIV'] = BUSY
         self.cycles -= 1
 
@@ -210,7 +209,7 @@ class FPDivStage(ExecuteStage):
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
 
-    def __block_register(self):
+    def _block_register(self):
         if self.instruction.dest_reg != '':
             REGISTER_STATUS[self.instruction.dest_reg] = BUSY
 
@@ -227,9 +226,9 @@ class WriteBackStage(Stage):
 
     def next(self):
         STAGE['WB'] = FREE
-        self.__unblock_register()
+        self._unblock_register()
         return None, self.hazard
 
-    def __unblock_register(self):
+    def _unblock_register(self):
         if self.instruction.dest_reg != '':
             REGISTER_STATUS[self.instruction.dest_reg] = FREE

@@ -11,8 +11,6 @@ class Instruction:
         self._full_name = instr_name  + ' ' + ', '.join(operands)
         self.name = instr_name
         self._store_registers(operands)
-        self.type = self.__instruction_type(self.name)
-        self.func_unit = self.__functional_unit(self.name)
         self.address = Instruction.count * WORD_SIZE
         Instruction.count += 1
 
@@ -21,7 +19,7 @@ class Instruction:
         return self._full_name
 
 
-    def __instruction_type(self, name):
+    def type(self, name):
         if name in ['LW', 'SW', 'L.D', 'S.D']:
             return 'DATA'
         elif name in ['J', 'BEQ', 'BNE']:
@@ -32,14 +30,14 @@ class Instruction:
             return 'ALU'
 
 
-    def __functional_unit(self, name):
-        if name in ['ADD.D', 'SUB.D']:
+    def functional_unit(self):
+        if self.name in ['ADD.D', 'SUB.D']:
             return 'FP_ADD'
-        elif name == 'MUL.D':
+        elif self.name == 'MUL.D':
             return 'FP_MUL'
-        elif name == 'DIV.D':
+        elif self.name == 'DIV.D':
             return 'FP_DIV'
-        elif name in ['J', 'BNE', 'BEQ', 'HLT']:
+        elif self.name in ['J', 'BNE', 'BEQ', 'HLT']:
             return 'NONE'
         else:
             return 'IU'
