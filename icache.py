@@ -4,13 +4,11 @@ from cache_block import *
 
 class ICache:
 
-    size = CACHE_SIZE
-    block_size = CACHE_BLOCK_SIZE
     cache_block = []
 
     def __init__(self):
-        for i in range(ICache.size):
-            ICache.cache_block.append(CacheBlock(i, ICache.block_size))
+        for i in range(CACHE_SIZE):
+            ICache.cache_block.append(CacheBlock(i, CACHE_BLOCK_SIZE))
 
     @classmethod
     def access(self, address):
