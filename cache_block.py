@@ -1,6 +1,6 @@
 class CacheBlock:
     def __init__(self, id, size):
-        self.id = 0
+        self.id = id
         self.size = size
         self.tag = 0
         self.valid = False
