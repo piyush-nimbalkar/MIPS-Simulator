@@ -50,7 +50,7 @@ def parse_data(filename):
         for i in line.strip():
             value += pow(2, count) * int(i)
             count -= 1
-        DATA[MEMORY_BASE_ADDRESS + word_count] = value
+        DATA[MEMORY_BASE_ADDRESS + (word_count * WORD_SIZE)] = value
         word_count += 1
 
 
