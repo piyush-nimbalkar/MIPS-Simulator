@@ -50,3 +50,5 @@ FP_DIV = {
     'CYCLES': 20,
     'PIPELINED': False
 }
+
+ACCESS_TIME = {}

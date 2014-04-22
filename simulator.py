@@ -67,6 +67,12 @@ def parse_config(filename):
             write_pipelining_status(FP_MUL, split_line[1])
         elif 'divider' in split_line[0]:
             write_pipelining_status(FP_DIV, split_line[1])
+        elif 'memory' in split_line[0]:
+            ACCESS_TIME['MEMORY'] = int(split_line[1].strip())
+        elif 'i-cache' in split_line[0]:
+            ACCESS_TIME['ICACHE'] = int(split_line[1].strip())
+        elif 'd-cache' in split_line[0]:
+            ACCESS_TIME['DCACHE'] = int(split_line[1].strip())
 
 
 def write_pipelining_status(fu_hash, param_string):
