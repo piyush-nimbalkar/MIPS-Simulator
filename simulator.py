@@ -1,6 +1,7 @@
 from collections import deque
 from instruction import *
 from executable import *
+from icache import *
 from config import *
 
 
@@ -83,6 +84,9 @@ def reset_register_status():
         REGISTER_STATUS['F' + str(i)] = FREE
 
 
+def initialize_cache():
+    ICache()
+
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
@@ -127,5 +131,6 @@ if  __name__ == '__main__':
     parse_registers('reg.txt')
     parse_data('data.txt')
     parse_config('config.txt')
+    initialize_cache()
     reset_register_status()
     simulate_run()

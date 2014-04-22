@@ -17,8 +17,8 @@ class ICache:
         tag = address >> 6
         blk_no = (address >> 4) % 4
         if ICache.cache_block[blk_no].valid == True and ICache.cache_block[blk_no].tag == tag:
-            return True, address
+            return HIT
         else:
             ICache.cache_block[blk_no].tag = tag
             ICache.cache_block[blk_no].valid = True
-            return False, address
+            return MISS

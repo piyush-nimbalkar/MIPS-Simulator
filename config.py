@@ -20,6 +20,10 @@ BUSY = True
 
 FREE = False
 
+HIT = True
+
+MISS = False
+
 STAGE = {
     'IF': FREE,
     'ID': FREE,

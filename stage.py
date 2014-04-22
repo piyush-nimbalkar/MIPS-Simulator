@@ -1,5 +1,6 @@
 from config import *
 from hazard import *
+from icache import *
 import executable
 
 
@@ -11,13 +12,18 @@ class FetchStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
         self.name = 'IF'
+        if ICache.access(self.instruction.address) == HIT:
+            self.cycles = 1
+        else:
+            self.cycles = 6
         self.hazard = Hazard()
 
     def run(self, instruction):
         STAGE['IF'] = BUSY
+        self.cycles -= 1
 
     def next(self):
-        if STAGE['ID'] == FREE:
+        if self.cycles <= 0 and STAGE['ID'] == FREE:
             STAGE['IF'] = FREE
             return DecodeStage(self.instruction), self.hazard
         return self, self.hazard
