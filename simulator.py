@@ -133,10 +133,12 @@ def simulate_run():
             REGISTER['PC'] += 1
 
 
+    result = sorted(result, key=lambda x: x.IF_cycle)
+    result[len(result) - 1].ID_cycle = 0
     print('-' * 86)
     print('INSTRUCTION\t\tIF\tID\tEX\tWB\tRAW\tWAR\tWAW\tSTRUCT')
     print('-' * 86)
-    for row in sorted(result, key=lambda x: x.IF_cycle):
+    for row in result:
         print(row)
         print('-' * 86)
 
