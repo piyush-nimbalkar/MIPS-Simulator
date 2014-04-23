@@ -146,7 +146,12 @@ class MemoryStage(ExecuteStage):
             return DCache.read(address)
         elif self.instruction.name == 'L.D':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            return DCache.read(address) + 1
+            first_word_access_time = DCache.read(address)
+            second_word_access_time = DCache.read(address + 4)
+            if second_word_access_time == ACCESS_TIME['DCACHE']:
+                return first_word_access_time + 1
+            else:
+                return first_word_access_time + second_word_access_time
         return 1
 
 
