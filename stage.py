@@ -13,7 +13,7 @@ class FetchStage(Stage):
     def __init__(self, instruction):
         self.instruction = instruction
         self.name = 'IF'
-        self.cycles = self._fetch_instruction()
+        self.cycles = ICache.read(self.instruction.address)
         self.hazard = Hazard()
 
     def run(self, instruction):
@@ -25,12 +25,6 @@ class FetchStage(Stage):
             STAGE['IF'] = FREE
             return DecodeStage(self.instruction), self.hazard
         return self, self.hazard
-
-    def _fetch_instruction(self):
-        if ICache.access(self.instruction.address) == HIT:
-            return ACCESS_TIME['ICACHE']
-        else:
-            return (ACCESS_TIME['ICACHE'] + ACCESS_TIME['MEMORY']) * 2
 
 
 

@@ -11,12 +11,12 @@ class ICache:
             ICache.cache_block.append(CacheBlock(i, CACHE_BLOCK_SIZE))
 
     @classmethod
-    def access(self, address):
+    def read(self, address):
         tag = address >> 6
         blk_no = (address >> 4) % 4
         if ICache.cache_block[blk_no].valid == True and ICache.cache_block[blk_no].tag == tag:
-            return HIT
+            return ACCESS_TIME['ICACHE']
         else:
             ICache.cache_block[blk_no].tag = tag
             ICache.cache_block[blk_no].valid = True
-            return MISS
+            return (ACCESS_TIME['ICACHE'] + ACCESS_TIME['MEMORY']) * 2
