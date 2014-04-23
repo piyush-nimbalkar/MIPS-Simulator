@@ -14,7 +14,7 @@ class DCache:
 
 
     @classmethod
-    def access(self, address):
+    def read(self, address, size = 1):
         address -= MEMORY_BASE_ADDRESS
         tag = address >> 5
         blk_no = (address >> 4) % 2
@@ -25,11 +25,57 @@ class DCache:
                 return HIT, DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2]
 
         set_no = DCache.lru_for_cache_block[blk_no]
+        if DCache.sets[set_no].cache_block[blk_no].dirty:
+            old_tag = DCache.sets[set_no].cache_block[blk_no].tag
+            old_address = (old_tag << 5) | (blk_no << 4)
+            base_address = MEMORY_BASE_ADDRESS + old_address
+            for i in range(CACHE_BLOCK_SIZE):
+                DATA[base_address + (i * WORD_SIZE)] = DCache.sets[set_no].cache_block[blk_no].words[i]
+
+
+
         DCache.sets[set_no].cache_block[blk_no].tag = tag
         DCache.sets[set_no].cache_block[blk_no].valid = True
-        DCache.sets[set_no].cache_block[blk_no].words = []
         DCache.lru_for_cache_block[blk_no] = 1 if set_no == 0 else 0
+
         base_address = MEMORY_BASE_ADDRESS + ((address >> 4) << 4)
         for i in range(CACHE_BLOCK_SIZE):
-            DCache.sets[set_no].cache_block[blk_no].words.append(DATA[base_address + (i * WORD_SIZE)])
+            DCache.sets[set_no].cache_block[blk_no].words[i] = DATA[base_address + (i * WORD_SIZE)]
+
+        return MISS, DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2]
+
+
+    @classmethod
+    def write(self, address, value, size = 1):
+        address -= MEMORY_BASE_ADDRESS
+        new_tag = address >> 5
+        blk_no = (address >> 4) % 2
+
+        for i in range(CACHE_SETS):
+            if DCache.sets[i].cache_block[blk_no].valid == True and DCache.sets[i].cache_block[blk_no].tag == new_tag:
+                DCache.lru_for_cache_block[blk_no] = 1 if i == 0 else 0
+                DCache.sets[i].cache_block[blk_no].dirty = True
+                DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2] = value
+                return HIT, DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2]
+
+
+        set_no = DCache.lru_for_cache_block[blk_no]
+        if DCache.sets[set_no].cache_block[blk_no].dirty:
+            old_tag = DCache.sets[set_no].cache_block[blk_no].tag
+            old_address = (old_tag << 5) | (blk_no << 4)
+            base_address = MEMORY_BASE_ADDRESS + old_address
+            for i in range(CACHE_BLOCK_SIZE):
+                DATA[base_address + (i * WORD_SIZE)] = DCache.sets[set_no].cache_block[blk_no].words[i]
+
+        DCache.sets[set_no].cache_block[blk_no].tag = new_tag
+        DCache.sets[set_no].cache_block[blk_no].valid = True
+        DCache.lru_for_cache_block[blk_no] = 1 if set_no == 0 else 0
+
+        base_address = MEMORY_BASE_ADDRESS + ((address >> 4) << 4)
+        for i in range(CACHE_BLOCK_SIZE):
+            if ((address & 12) >> 2) == i:
+                DCache.sets[set_no].cache_block[blk_no].words[i] = value
+            else:
+                DCache.sets[set_no].cache_block[blk_no].words[i] = DATA[base_address + (i * WORD_SIZE)]
+
         return MISS, DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2]

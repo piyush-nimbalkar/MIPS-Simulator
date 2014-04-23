@@ -4,7 +4,8 @@ class CacheBlock:
         self.size = size
         self.tag = 0
         self.valid = False
-        self.words = []
+        self.dirty = False
+        self.words = [0, 0, 0, 0]
 
     def store(self, words):
         self.words = words
