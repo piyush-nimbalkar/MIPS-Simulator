@@ -116,7 +116,6 @@ def simulate_run():
                             result.append(instruction_queue.pop().result)
                             STAGE['IF'] = FREE
                             REGISTER['FLUSH'] = False
-                            print(REGISTER['PC'])
                     queue_size -= 1
                 else:
                     instruction_queue.appendleft(instruction)
@@ -128,7 +127,6 @@ def simulate_run():
         clock_cycle += 1
 
         if STAGE['IF'] == FREE and REGISTER['PC'] < len(INSTRUCTIONS):
-            print(REGISTER['PC'])
             instruction_queue.appendleft(Executable(INSTRUCTIONS[REGISTER['PC']], clock_cycle))
             REGISTER['PC'] += 1
 
