@@ -14,7 +14,7 @@ class DCache:
 
 
     @classmethod
-    def read(self, address, size = 1):
+    def read(self, address):
         address -= MEMORY_BASE_ADDRESS
         tag = address >> 5
         blk_no = (address >> 4) % 2
@@ -32,8 +32,6 @@ class DCache:
             for i in range(CACHE_BLOCK_SIZE):
                 DATA[base_address + (i * WORD_SIZE)] = DCache.sets[set_no].cache_block[blk_no].words[i]
 
-
-
         DCache.sets[set_no].cache_block[blk_no].tag = tag
         DCache.sets[set_no].cache_block[blk_no].valid = True
         DCache.lru_for_cache_block[blk_no] = 1 if set_no == 0 else 0
@@ -46,7 +44,7 @@ class DCache:
 
 
     @classmethod
-    def write(self, address, value, size = 1):
+    def write(self, address, value):
         address -= MEMORY_BASE_ADDRESS
         new_tag = address >> 5
         blk_no = (address >> 4) % 2
