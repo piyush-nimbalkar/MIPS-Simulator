@@ -5,16 +5,18 @@ from dcache import *
 import executable
 
 
-class Stage: pass
+class Stage:
+    def __init__(self, instruction):
+        self.instruction = instruction
+        self.hazard = Hazard()
 
 
 
 class FetchStage(Stage):
     def __init__(self, instruction):
-        self.instruction = instruction
+        Stage.__init__(self, instruction)
         self.name = 'IF'
         self.cycles = ICache.read(self.instruction.address)
-        self.hazard = Hazard()
 
     def run(self, instruction):
         STAGE['IF'] = BUSY
@@ -30,9 +32,8 @@ class FetchStage(Stage):
 
 class DecodeStage(Stage):
     def __init__(self, instruction):
-        self.instruction = instruction
+        Stage.__init__(self, instruction)
         self.name = 'ID'
-        self.hazard = Hazard()
 
     def run(self, instruction):
         STAGE['ID'] = BUSY
@@ -79,9 +80,8 @@ class DecodeStage(Stage):
 
 class ExecuteStage(Stage):
     def __init__(self, instruction):
-        self.instruction = instruction
+        Stage.__init__(self, instruction)
         self.name = 'EX'
-        self.hazard = Hazard()
 
     def run(self, instruction):
         if STAGE['IU'] != BUSY:
@@ -181,10 +181,6 @@ class FPAddStage(ExecuteStage):
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
 
-    def _block_register(self):
-        if self.instruction.dest_reg != '':
-            REGISTER_STATUS[self.instruction.dest_reg] = BUSY
-
 
 
 class FPMulStage(ExecuteStage):
@@ -207,10 +203,6 @@ class FPMulStage(ExecuteStage):
             STAGE['FP_MUL'] = FREE
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
-
-    def _block_register(self):
-        if self.instruction.dest_reg != '':
-            REGISTER_STATUS[self.instruction.dest_reg] = BUSY
 
 
 
@@ -235,17 +227,12 @@ class FPDivStage(ExecuteStage):
             return WriteBackStage(self.instruction), self.hazard
         return self, self.hazard
 
-    def _block_register(self):
-        if self.instruction.dest_reg != '':
-            REGISTER_STATUS[self.instruction.dest_reg] = BUSY
-
 
 
 class WriteBackStage(Stage):
     def __init__(self, instruction):
-        self.instruction = instruction
+        Stage.__init__(self, instruction)
         self.name = 'WB'
-        self.hazard = Hazard()
 
     def run(self, instruction):
         STAGE['WB'] = BUSY
