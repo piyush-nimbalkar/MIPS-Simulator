@@ -2,6 +2,7 @@ from collections import deque
 from instruction import *
 from executable import *
 from icache import *
+from dcache import *
 from config import *
 
 
@@ -92,6 +93,7 @@ def reset_register_status():
 
 def initialize_cache():
     ICache()
+    DCache()
 
 def simulate_run():
     instruction_queue = deque([])

@@ -1,6 +1,7 @@
 from config import *
 from hazard import *
 from icache import *
+from dcache import *
 import executable
 
 
@@ -131,16 +132,28 @@ class ExecuteStage(Stage):
 class MemoryStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
+        self.cycles = self._calc_memory_cycles()
 
     def run(self, instruction):
         STAGE['MEM'] = BUSY
+        self.cycles -= 1
 
     def next(self):
-        if STAGE['WB'] == FREE:
+        if self.cycles < 0:
+            self.hazard.struct = True
+        if self.cycles <= 0 and STAGE['WB'] == FREE:
             STAGE['MEM'] = FREE
             return WriteBackStage(self.instruction), self.hazard
-        self.hazard.struct = True
         return self, self.hazard
+
+    def _calc_memory_cycles(self):
+        if self.instruction.name == 'LW':
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
+            return DCache.read(address)
+        elif self.instruction.name == 'L.D':
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
+            return DCache.read(address) + 1
+        return 1
 
 
 

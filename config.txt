@@ -1,5 +1,5 @@
-FP Adder: 4, no
-FP Multiplier: 6, no
+FP Adder: 4, yes
+FP Multiplier: 6, yes
 FP Divider: 20, no
 Main Memory: 2
 I-Cache: 1
