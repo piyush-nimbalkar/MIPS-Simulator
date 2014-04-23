@@ -143,11 +143,12 @@ class MemoryStage(ExecuteStage):
     def _calc_memory_cycles(self):
         if self.instruction.name == 'LW':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            return DCache.read(address)
+            REGISTER[self.instruction.dest_reg], cycles = DCache.read(address)
+            return cycles
         elif self.instruction.name == 'L.D':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            first_word_access_time = DCache.read(address)
-            second_word_access_time = DCache.read(address + 4)
+            word, first_word_access_time = DCache.read(address)
+            word, second_word_access_time = DCache.read(address + 4)
             if second_word_access_time == ACCESS_TIME['DCACHE']:
                 return first_word_access_time + 1
             else:

@@ -21,7 +21,7 @@ class DCache:
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
                 DCache._set_lru(blk_no, i)
-                return ACCESS_TIME['DCACHE']
+                return DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2], ACCESS_TIME['DCACHE']
 
         set_no = DCache.lru_for_cache_block[blk_no]
 
@@ -29,7 +29,7 @@ class DCache:
             DCache._write_back(set_no, blk_no)
 
         DCache._setup_block(address, set_no)
-        return (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
+        return DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2], (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
 
 
     @classmethod
