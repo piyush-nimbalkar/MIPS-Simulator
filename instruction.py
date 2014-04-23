@@ -72,7 +72,7 @@ class Instruction:
 
 
     def _extract_operands(self, operands_):
-        if operands_ and '(' in operands_[1]:
+        if len(operands_) > 1 and '(' in operands_[1]:
             operands = [operands_[0]]
             operands.append(operands_[1].split('(')[0])
             operands.append(operands_[1].split('(')[1].split(')')[0])
