@@ -147,12 +147,15 @@ class MemoryStage(ExecuteStage):
             return cycles
         elif self.instruction.name == 'L.D':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            word, first_word_access_time = DCache.read(address)
-            word, second_word_access_time = DCache.read(address + 4)
-            if second_word_access_time == ACCESS_TIME['DCACHE']:
-                return first_word_access_time + 1
-            else:
-                return first_word_access_time + second_word_access_time
+            word, first_word_read_time = DCache.read(address)
+            word, second_word_read_time = DCache.read(address + 4)
+            return first_word_read_time + second_word_read_time
+        elif self.instruction.name == 'SW':
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
+            return DCache.write(address, REGISTER[self.instruction.src_reg[0]])
+        elif self.instruction.name == 'S.D':
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
+            return DCache.write(address, 0, False) + DCache.write(address + 4, 0, False)
         return 1
 
 

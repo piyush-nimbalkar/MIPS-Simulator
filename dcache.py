@@ -17,6 +17,7 @@ class DCache:
     def read(self, address):
         address -= MEMORY_BASE_ADDRESS
         blk_no = (address >> 4) % 2
+        read_cycles = 0
 
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
@@ -26,31 +27,33 @@ class DCache:
         set_no = DCache.lru_for_cache_block[blk_no]
 
         if DCache.sets[set_no].cache_block[blk_no].dirty:
-            DCache._write_back(set_no, blk_no)
+            read_cycles += DCache._write_back(set_no, blk_no)
 
         DCache._setup_block(address, set_no)
-        return DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2], (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
+        read_cycles += (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
+        return DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2], read_cycles
 
 
     @classmethod
-    def write(self, address, value):
+    def write(self, address, value, writable = True):
         address -= MEMORY_BASE_ADDRESS
         blk_no = (address >> 4) % 2
+        write_cycles = 0
 
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
                 DCache._set_lru(blk_no, i)
-                DCache._set_value(address, i, value)
-                return HIT, value
+                DCache._set_value(address, i, value, writable)
+                return ACCESS_TIME['DCACHE']
 
         set_no = DCache.lru_for_cache_block[blk_no]
 
         if DCache.sets[set_no].cache_block[blk_no].dirty:
-            DCache._write_back(set_no, blk_no)
+            write_cycles += DCache._write_back(set_no, blk_no)
 
         DCache._setup_block(address, set_no)
-        DCache._set_value(address, set_no, value)
-        return MISS, value
+        DCache._set_value(address, set_no, value, writable)
+        return write_cycles + (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
 
 
     @classmethod
@@ -66,6 +69,7 @@ class DCache:
         base_address = MEMORY_BASE_ADDRESS + ((tag << 5) | (blk_no << 4))
         for i in range(CACHE_BLOCK_SIZE):
             DATA[base_address + (i * WORD_SIZE)] = DCache.sets[set_no].cache_block[blk_no].words[i]
+        return (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
 
 
     @classmethod
@@ -91,7 +95,8 @@ class DCache:
 
 
     @classmethod
-    def _set_value(self, address, set_no, value):
+    def _set_value(self, address, set_no, value, writable):
         blk_no = (address >> 4) % 2
         DCache.sets[set_no].cache_block[blk_no].dirty = True
-        DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2] = value
+        if writable:
+            DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2] = value
