@@ -63,7 +63,7 @@ class Instruction:
             self.src_reg = operands[:1]
             self.immediate = operands[2]
         elif self.name in ['BNE', 'BEQ']:
-            self.src_reg = [operands[0]]
+            self.src_reg = operands[:2]
             self.immediate = operands[2]
         elif self.name in ['J']:
             self.immediate = operands[0]
