@@ -1,6 +1,6 @@
 DATA = {}
 
-REGISTER = {}
+REGISTER = {'PC': 0, 'FLUSH': False}
 
 REGISTER_STATUS = {}
 

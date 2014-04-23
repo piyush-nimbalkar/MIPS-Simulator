@@ -6,7 +6,7 @@ GG: L.D F1, 4(R4)
     ADD.D   F7, F2, F6
     ADD.D   F6, F1, F7
     DADDI   R4, R4, 2
-    DADDI   R5, R5, 2
+    DADDI   R5, R5, 8
     DSUB    R1, R1, R2
     BNE     R1, R3, GG
     HLT

@@ -42,6 +42,7 @@ class DecodeStage(Stage):
         func_unit = self.instruction.functional_unit()
         self._detect_hazard(func_unit)
         if func_unit == 'NONE' and not self._is_hazard():
+            self._execute_branch_instruction()
             STAGE['ID'] = FREE
             return None, self.hazard
         if func_unit != 'NONE' and STAGE[func_unit] == FREE and not self._is_hazard():
@@ -58,6 +59,19 @@ class DecodeStage(Stage):
             return FPDivStage(self.instruction)
         else:
             return ExecuteStage(self.instruction)
+
+    def _execute_branch_instruction(self):
+        if self.instruction.name == 'J':
+            REGISTER['PC'] = self.instruction.immediate / 4
+            REGISTER['FLUSH'] = True
+        elif self.instruction.name == 'BEQ':
+            if REGISTER[self.instruction.src_reg[0]] == REGISTER[self.instruction.src_reg[1]]:
+                REGISTER['PC'] = self.instruction.immediate / 4
+                REGISTER['FLUSH'] = True
+        elif self.instruction.name == 'BNE':
+            if REGISTER[self.instruction.src_reg[0]] != REGISTER[self.instruction.src_reg[1]]:
+                REGISTER['PC'] = self.instruction.immediate / 4
+                REGISTER['FLUSH'] = True
 
     def _detect_hazard(self, func_unit):
         if self.instruction.dest_reg != '' and REGISTER_STATUS[self.instruction.dest_reg] == BUSY:

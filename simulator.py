@@ -98,8 +98,8 @@ def initialize_cache():
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
-    instruction_count = 1
     result = []
+    REGISTER['PC'] = 1
     instruction_queue.appendleft(Executable(INSTRUCTIONS[0], clock_cycle))
 
     while len(instruction_queue) > 0:
@@ -112,17 +112,25 @@ def simulate_run():
                         instruction_queue.appendleft(instruction)
                     else:
                         result.append(instruction.result)
+                        if REGISTER['FLUSH']:
+                            result.append(instruction_queue.pop().result)
+                            STAGE['IF'] = FREE
+                            REGISTER['FLUSH'] = False
+                            print(REGISTER['PC'])
                     queue_size -= 1
                 else:
                     instruction_queue.appendleft(instruction)
+                if len(instruction_queue) == 0:
+                    break
             if queue_size == 0:
                 break
 
         clock_cycle += 1
 
-        if STAGE['IF'] == FREE and instruction_count < len(INSTRUCTIONS):
-            instruction_queue.appendleft(Executable(INSTRUCTIONS[instruction_count], clock_cycle))
-            instruction_count += 1
+        if STAGE['IF'] == FREE and REGISTER['PC'] < len(INSTRUCTIONS):
+            print(REGISTER['PC'])
+            instruction_queue.appendleft(Executable(INSTRUCTIONS[REGISTER['PC']], clock_cycle))
+            REGISTER['PC'] += 1
 
 
     print('-' * 86)

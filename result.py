@@ -13,7 +13,11 @@ class Result:
     def __str__(self):
         string = '%-24s' % str(self.instruction)
         string += str(self.IF_cycle) + '\t'
-        string += str(self.ID_cycle) + '\t'
+
+        if self.ID_cycle != 0:
+            string += str(self.ID_cycle) + '\t'
+        else:
+            string += '-\t'
 
         if self.EX_cycle != 0:
             string += str(self.EX_cycle) + '\t'
