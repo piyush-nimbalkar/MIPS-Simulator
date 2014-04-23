@@ -57,7 +57,7 @@ class DCache:
     def _is_address_present_in_set(self, address, set_no):
         tag = address >> 5
         blk_no = (address >> 4) % 2
-        return DCache.sets[set_no].cache_block[blk_no].valid == True and DCache.sets[set_no].cache_block[blk_no].tag == tag
+        return DCache.sets[set_no].is_block_valid(blk_no) and DCache.sets[set_no].tag_for_block(blk_no) == tag
 
 
     @classmethod
