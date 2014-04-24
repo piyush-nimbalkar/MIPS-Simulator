@@ -74,13 +74,14 @@ class DecodeStage(Stage):
                 REGISTER['FLUSH'] = True
 
     def _detect_hazard(self, func_unit):
+        if func_unit != 'NONE' and STAGE[func_unit] == BUSY:
+            if not (self.hazard.raw or self.hazard.waw):
+                self.hazard.struct = True
         if self.instruction.dest_reg != '' and REGISTER_STATUS[self.instruction.dest_reg] == BUSY:
             self.hazard.waw = True
         for reg in self.instruction.src_reg:
             if REGISTER_STATUS[reg] == BUSY:
                 self.hazard.raw = True
-        if func_unit != 'NONE' and STAGE[func_unit] == BUSY:
-            self.hazard.struct = True
 
     def _is_hazard(self):
         if self.instruction.dest_reg != '' and REGISTER_STATUS[self.instruction.dest_reg] == BUSY:
