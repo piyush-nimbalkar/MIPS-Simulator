@@ -34,7 +34,9 @@ STAGE = {
     'FP_ADD': FREE,
     'FP_MUL': FREE,
     'FP_DIV': FREE,
-    'WB': FREE
+    'WB': FREE,
+    'IBUS': FREE,
+    'DBUS': FREE
 }
 
 

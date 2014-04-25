@@ -22,7 +22,7 @@ class DCache:
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
                 DCache._set_lru(blk_no, i)
-                return DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2], ACCESS_TIME['DCACHE']
+                return HIT, DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2], ACCESS_TIME['DCACHE']
 
         set_no = DCache.lru_for_cache_block[blk_no]
 
@@ -31,7 +31,7 @@ class DCache:
 
         DCache._setup_block(address, set_no)
         read_cycles += (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
-        return DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2], read_cycles
+        return MISS, DCache.sets[set_no].cache_block[blk_no].words[(address & 12) >> 2], read_cycles
 
 
     @classmethod
@@ -44,7 +44,7 @@ class DCache:
             if DCache._is_address_present_in_set(address, i):
                 DCache._set_lru(blk_no, i)
                 DCache._set_value(address, i, value, writable)
-                return ACCESS_TIME['DCACHE']
+                return HIT, ACCESS_TIME['DCACHE']
 
         set_no = DCache.lru_for_cache_block[blk_no]
 
@@ -53,7 +53,7 @@ class DCache:
 
         DCache._setup_block(address, set_no)
         DCache._set_value(address, set_no, value, writable)
-        return write_cycles + (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
+        return MISS, write_cycles + (ACCESS_TIME['DCACHE'] + ACCESS_TIME['MEMORY']) * 2
 
 
     @classmethod
