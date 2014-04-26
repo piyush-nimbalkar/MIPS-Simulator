@@ -6,9 +6,10 @@ from dcache import *
 from config import *
 
 
+labels = {}
+
 def parse(filename):
     file = open(filename, 'r')
-    labels = {}
 
     for line in file:
         line = line.strip().upper()
@@ -133,12 +134,17 @@ def simulate_run():
 
     result = sorted(result, key=lambda x: x.IF_cycle)
     result[len(result) - 1].ID_cycle = 0
-    print('-' * 86)
-    print('INSTRUCTION\t\tIF\tID\tEX\tWB\tRAW\tWAR\tWAW\tSTRUCT')
-    print('-' * 86)
-    for row in result:
-        print(row)
-        print('-' * 86)
+    print('-' * 94)
+    print('\tInstruction\t\tFT\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct')
+    print('-' * 94)
+    for i in range(len(result)):
+        for label, address in labels.items():
+            if result[i].instruction.address == address:
+                print(label + ':\t'),
+            else:
+                print('\t'),
+        print(result[i])
+    print('-' * 94)
 
 
 
