@@ -97,6 +97,7 @@ def initialize_cache():
     ICache()
     DCache()
 
+
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
@@ -132,7 +133,10 @@ def simulate_run():
             instruction_queue.appendleft(Executable(INSTRUCTIONS[REGISTER['PC']], clock_cycle))
             REGISTER['PC'] += 1
 
+    display_result(result)
 
+
+def display_result(result):
     result = sorted(result, key=lambda x: x.IF_cycle)
     result[len(result) - 1].ID_cycle = 0
     print('-' * 94)
