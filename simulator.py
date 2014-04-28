@@ -4,11 +4,12 @@ from executable import *
 from icache import *
 from dcache import *
 from config import *
+import sys
 
 
 labels = {}
 
-def parse(filename):
+def parse_instructions(filename):
     file = open(filename, 'r')
 
     for line in file:
@@ -149,10 +150,13 @@ def simulate_run():
 
 
 if  __name__ == '__main__':
-    parse('inst.txt')
-    parse_registers('reg.txt')
-    parse_data('data.txt')
-    parse_config('config.txt')
+    if len(sys.argv) != 6:
+        print('Usage: python simulator.py inst.txt data.txt reg.txt config.txt result.txt')
+        exit()
+    parse_instructions(sys.argv[1])
+    parse_data(sys.argv[2])
+    parse_registers(sys.argv[3])
+    parse_config(sys.argv[4])
     initialize_cache()
     reset_register_status()
     simulate_run()
