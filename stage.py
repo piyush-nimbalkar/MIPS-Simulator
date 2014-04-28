@@ -194,7 +194,8 @@ class MemoryStage(ExecuteStage):
             return first_word_read_time + second_word_read_time
         elif self.instruction.name == 'SW':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
-            return DCache.write(address, REGISTER[self.instruction.src_reg[0]])
+            self.cache_hit, cycles = DCache.write(address, REGISTER[self.instruction.src_reg[0]])
+            return cycles
         elif self.instruction.name == 'S.D':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
             first_word_hit, first_word_write_time = DCache.write(address, 0, False)

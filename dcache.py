@@ -40,7 +40,7 @@ class DCache:
 
     @classmethod
     def write(self, address, value, writable = True):
-        IDache.request_count += 1
+        DCache.request_count += 1
         address -= MEMORY_BASE_ADDRESS
         blk_no = (address >> 4) % 2
         write_cycles = 0
