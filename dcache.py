@@ -7,6 +7,8 @@ class DCache:
 
     sets = []
     lru_for_cache_block = [0, 0]
+    request_count = 0
+    hit_count = 0
 
     def __init__(self):
         for i in range(CACHE_SETS):
@@ -15,12 +17,14 @@ class DCache:
 
     @classmethod
     def read(self, address):
+        DCache.request_count += 1
         address -= MEMORY_BASE_ADDRESS
         blk_no = (address >> 4) % 2
         read_cycles = 0
 
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
+                DCache.hit_count += 1
                 DCache._set_lru(blk_no, i)
                 return HIT, DCache.sets[i].cache_block[blk_no].words[(address & 12) >> 2], ACCESS_TIME['DCACHE']
 
@@ -36,12 +40,14 @@ class DCache:
 
     @classmethod
     def write(self, address, value, writable = True):
+        IDache.request_count += 1
         address -= MEMORY_BASE_ADDRESS
         blk_no = (address >> 4) % 2
         write_cycles = 0
 
         for i in range(CACHE_SETS):
             if DCache._is_address_present_in_set(address, i):
+                DCache.hit_count += 1
                 DCache._set_lru(blk_no, i)
                 DCache._set_value(address, i, value, writable)
                 return HIT, ACCESS_TIME['DCACHE']

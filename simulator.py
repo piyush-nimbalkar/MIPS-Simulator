@@ -151,6 +151,12 @@ def display_result(result):
         print(result[i])
     print('-' * 94)
 
+    print("\nTotal number of access requests for instruction cache: " + str(ICache.request_count))
+    print("Number of instruction cache hits: " + str(ICache.hit_count))
+    print("\nTotal number of access requests for data cache: " + str(DCache.request_count))
+    print("Number of data cache hits: " + str(DCache.hit_count))
+    print
+
 
 
 if  __name__ == '__main__':
