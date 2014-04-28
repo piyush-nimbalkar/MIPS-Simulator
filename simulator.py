@@ -143,11 +143,13 @@ def display_result(result):
     print('\tInstruction\t\tFT\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct')
     print('-' * 94)
     for i in range(len(result)):
+        found_label = False
         for label, address in labels.items():
             if result[i].instruction.address == address:
+                found_label = True
                 print(label + ':\t'),
-            else:
-                print('\t'),
+        if not found_label:
+            print('\t'),
         print(result[i])
     print('-' * 94)
 
