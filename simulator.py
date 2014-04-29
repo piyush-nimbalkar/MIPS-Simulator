@@ -4,6 +4,7 @@ from executable import *
 from icache import *
 from dcache import *
 from config import *
+import operator
 import sys
 
 
@@ -106,6 +107,78 @@ def initialize_cache():
 
 
 
+def prioritize_for_write_back(new_queue, ex_queue):
+    priority_map = {}
+
+    for i in range(len(ex_queue)):
+        ex = ex_queue.pop()
+
+        if ex._instruction.functional_unit() == 'FP_DIV':
+            if FP_DIV['PIPELINED']:
+                priority_map[ex] = FP_DIV['CYCLES']
+            else:
+                priority_map[ex] = FP_DIV['CYCLES'] + 100
+
+        elif ex._instruction.functional_unit() == 'FP_MUL':
+            if FP_MUL['PIPELINED']:
+                priority_map[ex] = FP_MUL['CYCLES']
+            else:
+                priority_map[ex] = FP_MUL['CYCLES'] + 100
+
+        elif ex._instruction.functional_unit() == 'FP_ADD':
+            if FP_ADD['PIPELINED']:
+                priority_map[ex] = FP_ADD['CYCLES']
+            else:
+                priority_map[ex] = FP_ADD['CYCLES'] + 100
+
+        else:
+            priority_map[ex] = 0
+
+    sorted_x = sorted(priority_map.iteritems(), key=operator.itemgetter(1), reverse=True)
+    for element in sorted_x:
+        new_queue.appendleft(element[0])
+
+    return new_queue
+
+
+
+def reorder_instructions(old_queue):
+    new_queue = deque([])
+
+    for i in range(len(old_queue)):
+        instruction = old_queue.pop()
+        if instruction.current_stage.name == 'WB':
+            new_queue.appendleft(instruction)
+        else:
+            old_queue.appendleft(instruction)
+
+    ex_queue = deque([])
+    for i in range(len(old_queue)):
+        instruction = old_queue.pop()
+        if instruction.current_stage.name == 'EX':
+            ex_queue.appendleft(instruction)
+        else:
+            old_queue.appendleft(instruction)
+    new_queue = prioritize_for_write_back(new_queue, ex_queue)
+
+    for i in range(len(old_queue)):
+        instruction = old_queue.pop()
+        if instruction.current_stage.name == 'ID':
+            new_queue.appendleft(instruction)
+        else:
+            old_queue.appendleft(instruction)
+
+    for i in range(len(old_queue)):
+        instruction = old_queue.pop()
+        if instruction.current_stage.name == 'IF':
+            new_queue.appendleft(instruction)
+        else:
+            old_queue.appendleft(instruction)
+
+    return new_queue
+
+
+
 def simulate_run():
     instruction_queue = deque([])
     clock_cycle = 1
@@ -114,26 +187,21 @@ def simulate_run():
     instruction_queue.appendleft(Executable(INSTRUCTIONS[0], clock_cycle))
 
     while len(instruction_queue) > 0:
-        queue_size = len(instruction_queue)
-        for stage in ['WB', 'EX', 'ID', 'IF']:
-            transfer_queue = deque([])
-            while len(instruction_queue) > 0:
-                instruction = instruction_queue.pop()
-                if instruction.current_stage.name == stage:
-                    if instruction.continue_execution():
-                        transfer_queue.appendleft(instruction)
-                    else:
-                        result.append(instruction.result)
-                        if REGISTER['FLUSH']:
-                            result.append(instruction_queue.pop().result)
-                            STAGE['IF'] = FREE
-                            STAGE['IBUS'] = FREE
-                            REGISTER['FLUSH'] = False
-                    queue_size -= 1
-                else:
-                    transfer_queue.appendleft(instruction)
+        instruction_queue = reorder_instructions(instruction_queue)
+        transfer_queue = deque([])
+        while len(instruction_queue) > 0:
+            instruction = instruction_queue.pop()
+            if instruction.continue_execution():
+                transfer_queue.appendleft(instruction)
+            else:
+                result.append(instruction.result)
+                if REGISTER['FLUSH']:
+                    result.append(instruction_queue.pop().result)
+                    STAGE['IF'] = FREE
+                    STAGE['IBUS'] = FREE
+                    REGISTER['FLUSH'] = False
 
-            instruction_queue = transfer_queue
+        instruction_queue = transfer_queue
 
         clock_cycle += 1
 
