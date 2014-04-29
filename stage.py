@@ -25,6 +25,11 @@ class FetchStage(Stage):
         if not self.cache_hit and STAGE['DBUS'] == FREE:
             STAGE['IBUS'] = BUSY
 
+        if not self.cache_hit and MemoryStage.first_bus_access:
+            STAGE['IBUS'] = BUSY
+            STAGE['DBUS'] = FREE
+            MemoryStage.first_bus_access = False
+
         if self.cache_hit or STAGE['IBUS'] == BUSY:
             self.cycles -= 1
 
@@ -190,6 +195,9 @@ class ExecuteStage(Stage):
 
 
 class MemoryStage(ExecuteStage):
+
+    first_bus_access = False
+
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
         self.first_word_hit = True
@@ -198,6 +206,11 @@ class MemoryStage(ExecuteStage):
 
 
     def run(self, instruction):
+        if STAGE['MEM'] == FREE:
+            MemoryStage.first_bus_access = True
+        else:
+            MemoryStage.first_bus_access = False
+
         if self.first_word_cycles == 0:
             if not self.second_word_hit and STAGE['IBUS'] == BUSY and self.first_word_hit:
                 self.second_word_cycles -= 1
