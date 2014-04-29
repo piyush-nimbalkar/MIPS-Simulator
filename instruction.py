@@ -58,7 +58,7 @@ class Instruction:
             self.offset = operands[1]
             self.src_reg = [operands[0], operands[2]]
         elif self.name in ['DADDI', 'DSUBI', 'ANDI', 'ORI']:
-            self.src_reg = operands[:1]
+            self.src_reg = [operands[1]]
             self.immediate = operands[2]
         elif self.name in ['BNE', 'BEQ']:
             self.src_reg = operands[:2]
