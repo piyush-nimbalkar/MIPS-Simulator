@@ -1,3 +1,5 @@
+MAX = 100
+
 DATA = {}
 
 REGISTER = {'PC': 0, 'FLUSH': False}

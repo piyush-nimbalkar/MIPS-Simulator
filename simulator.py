@@ -109,30 +109,33 @@ def initialize_cache():
 
 def prioritize_for_write_back(new_queue, ex_queue):
     priority_map = {}
+    count = MAX
 
     for i in range(len(ex_queue)):
         ex = ex_queue.pop()
 
         if ex._instruction.functional_unit() == 'FP_DIV':
             if FP_DIV['PIPELINED']:
-                priority_map[ex] = FP_DIV['CYCLES']
+                priority_map[ex] = count + FP_DIV['CYCLES']
             else:
-                priority_map[ex] = FP_DIV['CYCLES'] + 100
+                priority_map[ex] = count + FP_DIV['CYCLES'] + MAX
 
         elif ex._instruction.functional_unit() == 'FP_MUL':
             if FP_MUL['PIPELINED']:
-                priority_map[ex] = FP_MUL['CYCLES']
+                priority_map[ex] = count + FP_MUL['CYCLES']
             else:
-                priority_map[ex] = FP_MUL['CYCLES'] + 100
+                priority_map[ex] = count + FP_MUL['CYCLES'] + MAX
 
         elif ex._instruction.functional_unit() == 'FP_ADD':
             if FP_ADD['PIPELINED']:
-                priority_map[ex] = FP_ADD['CYCLES']
+                priority_map[ex] = count + FP_ADD['CYCLES']
             else:
-                priority_map[ex] = FP_ADD['CYCLES'] + 100
+                priority_map[ex] = count + FP_ADD['CYCLES'] + MAX
 
         else:
-            priority_map[ex] = 0
+            priority_map[ex] = count
+
+        count -= 1
 
     sorted_x = sorted(priority_map.iteritems(), key=operator.itemgetter(1), reverse=True)
     for element in sorted_x:
