@@ -9,6 +9,7 @@ import sys
 
 labels = {}
 
+
 def parse_instructions(filename):
     file = open(filename, 'r')
 
@@ -30,6 +31,7 @@ def parse_instructions(filename):
             instr.set_immediate(labels[instr.immediate])
 
 
+
 def parse_registers(filename):
     file = open(filename, 'r')
     reg_count = 0
@@ -44,6 +46,7 @@ def parse_registers(filename):
         reg_count += 1
 
 
+
 def parse_data(filename):
     file = open(filename, 'r')
     word_count = 0
@@ -56,6 +59,7 @@ def parse_data(filename):
             count -= 1
         DATA[MEMORY_BASE_ADDRESS + (word_count * WORD_SIZE)] = value
         word_count += 1
+
 
 
 def parse_config(filename):
@@ -78,6 +82,7 @@ def parse_config(filename):
             ACCESS_TIME['DCACHE'] = int(split_line[1].strip())
 
 
+
 def write_pipelining_status(fu_hash, param_string):
     params = [x.strip() for x in param_string.split(',')]
     fu_hash['CYCLES'] = int(params[0])
@@ -87,15 +92,18 @@ def write_pipelining_status(fu_hash, param_string):
         fu_hash['PIPELINED'] = False
 
 
+
 def reset_register_status():
     for i in range(32):
         REGISTER_STATUS['R' + str(i)] = FREE
         REGISTER_STATUS['F' + str(i)] = FREE
 
 
+
 def initialize_cache():
     ICache()
     DCache()
+
 
 
 def simulate_run():
@@ -134,6 +142,7 @@ def simulate_run():
             REGISTER['PC'] += 1
 
     display_result(result)
+
 
 
 def display_result(result):

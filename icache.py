@@ -12,6 +12,7 @@ class ICache:
         for i in range(CACHE_SIZE):
             ICache.cache_block.append(CacheBlock(i, CACHE_BLOCK_SIZE))
 
+
     @classmethod
     def read(self, address):
         ICache.request_count += 1

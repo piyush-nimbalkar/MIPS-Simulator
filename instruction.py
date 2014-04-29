@@ -2,8 +2,6 @@ from config import *
 
 
 class Instruction:
-    """ Structure to store the instruction
-    """
 
     count = 0
 
