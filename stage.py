@@ -25,9 +25,6 @@ class FetchStage(Stage):
         if not self.cache_hit and STAGE['DBUS'] == FREE:
             STAGE['IBUS'] = BUSY
 
-        if not self.cache_hit and STAGE['DBUS'] == BUSY:
-            self.hazard.struct = True
-
         if self.cache_hit or STAGE['IBUS'] == BUSY:
             self.cycles -= 1
 
@@ -202,9 +199,6 @@ class MemoryStage(ExecuteStage):
 
     def run(self, instruction):
         if self.first_word_cycles == 0:
-            if not self.second_word_hit and STAGE['IBUS'] == BUSY:
-                self.hazard.struct = True
-
             if not self.second_word_hit and STAGE['IBUS'] == BUSY and self.first_word_hit:
                 self.second_word_cycles -= 1
 
@@ -213,9 +207,6 @@ class MemoryStage(ExecuteStage):
 
             if self.second_word_hit or STAGE['DBUS'] == BUSY:
                 self.second_word_cycles -= 1
-
-        if not self.first_word_hit and STAGE['IBUS'] == BUSY:
-            self.hazard.struct = True
 
         if not self.first_word_hit and STAGE['MEM'] == FREE and STAGE['IBUS'] == BUSY:
             self.first_word_cycles -= 1
