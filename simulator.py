@@ -108,24 +108,24 @@ def simulate_run():
     while len(instruction_queue) > 0:
         queue_size = len(instruction_queue)
         for stage in ['WB', 'EX', 'ID', 'IF']:
-            for i in range(0, len(instruction_queue)):
+            transfer_queue = deque([])
+            while len(instruction_queue) > 0:
                 instruction = instruction_queue.pop()
                 if instruction.current_stage.name == stage:
                     if instruction.continue_execution():
-                        instruction_queue.appendleft(instruction)
+                        transfer_queue.appendleft(instruction)
                     else:
                         result.append(instruction.result)
                         if REGISTER['FLUSH']:
                             result.append(instruction_queue.pop().result)
                             STAGE['IF'] = FREE
+                            STAGE['IBUS'] = FREE
                             REGISTER['FLUSH'] = False
                     queue_size -= 1
                 else:
-                    instruction_queue.appendleft(instruction)
-                if len(instruction_queue) == 0:
-                    break
-            if queue_size == 0:
-                break
+                    transfer_queue.appendleft(instruction)
+
+            instruction_queue = transfer_queue
 
         clock_cycle += 1
 

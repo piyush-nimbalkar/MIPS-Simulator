@@ -156,26 +156,40 @@ class ExecuteStage(Stage):
 class MemoryStage(ExecuteStage):
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
-        self.cache_hit = True
-        self.cycles = self._calc_memory_cycles()
+        self.first_word_hit = True
+        self.second_word_hit = True
+        self.first_word_cycles, self.second_word_cycles = self._calc_memory_cycles()
 
     def run(self, instruction):
-        if not self.cache_hit and STAGE['MEM'] == FREE and STAGE['IBUS'] == BUSY:
-            self.cycles -= 1
-        STAGE['MEM'] = BUSY
-        if not self.cache_hit and STAGE['IBUS'] == FREE:
-            STAGE['DBUS'] = BUSY
-        if not self.cache_hit and STAGE['IBUS'] == BUSY:
+        if self.first_word_cycles == 0:
+            if not self.second_word_hit and STAGE['IBUS'] == BUSY:
+                self.hazard.struct = True
+            if not self.second_word_hit and STAGE['IBUS'] == BUSY and self.first_word_hit:
+                self.second_word_cycles -= 1
+            if not self.second_word_hit and STAGE['IBUS'] == FREE:
+                STAGE['DBUS'] = BUSY
+            if self.second_word_hit or STAGE['DBUS'] == BUSY:
+                self.second_word_cycles -= 1
+
+        if not self.first_word_hit and STAGE['IBUS'] == BUSY:
             self.hazard.struct = True
-        if self.cache_hit or STAGE['DBUS'] == BUSY:
-            self.cycles -= 1
+        if not self.first_word_hit and STAGE['MEM'] == FREE and STAGE['IBUS'] == BUSY:
+            self.first_word_cycles -= 1
+        STAGE['MEM'] = BUSY
+        if not self.first_word_hit and STAGE['IBUS'] == FREE and self.first_word_cycles > 0:
+            STAGE['DBUS'] = BUSY
+        if (self.first_word_hit or STAGE['DBUS'] == BUSY) and self.first_word_cycles > 0:
+            self.first_word_cycles -= 1
+
 
     def next(self):
-        if self.cycles == 0:
+        if not self.first_word_hit and self.first_word_cycles == 0 and self.second_word_hit:
             STAGE['DBUS'] = FREE
-        if self.cycles < 0:
+        if not self.second_word_hit and self.second_word_cycles == 0:
+            STAGE['DBUS'] = FREE
+        if self.second_word_cycles < 0:
             self.hazard.struct = True
-        if self.cycles <= 0 and STAGE['WB'] == FREE:
+        if (self.first_word_cycles + self.second_word_cycles) <= 0 and STAGE['WB'] == FREE:
             STAGE['MEM'] = FREE
             return WriteBackStage(self.instruction)
         return self
@@ -183,27 +197,23 @@ class MemoryStage(ExecuteStage):
     def _calc_memory_cycles(self):
         if self.instruction.name == 'LW':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            self.cache_hit, REGISTER[self.instruction.dest_reg], cycles = DCache.read(address)
-            return cycles
+            self.first_word_hit, REGISTER[self.instruction.dest_reg], cycles = DCache.read(address)
+            return cycles, 0
         elif self.instruction.name == 'L.D':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            first_word_hit, word, first_word_read_time = DCache.read(address)
-            second_word_hit, word, second_word_read_time = DCache.read(address + 4)
-            if not (first_word_hit and second_word_hit):
-                self.cache_hit = False
-            return first_word_read_time + second_word_read_time
+            self.first_word_hit, word, first_word_read_time = DCache.read(address)
+            self.second_word_hit, word, second_word_read_time = DCache.read(address + 4)
+            return first_word_read_time, second_word_read_time
         elif self.instruction.name == 'SW':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
-            self.cache_hit, cycles = DCache.write(address, REGISTER[self.instruction.src_reg[0]])
-            return cycles
+            self.first_word_hit, cycles = DCache.write(address, REGISTER[self.instruction.src_reg[1]])
+            return cycles, 0
         elif self.instruction.name == 'S.D':
-            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
-            first_word_hit, first_word_write_time = DCache.write(address, 0, False)
-            second_word_hit, second_word_write_time = DCache.write(address + 4, 0, False)
-            if not (first_word_hit and second_word_hit):
-                self.cache_hit = False
-            return first_word_write_time + second_word_write_time
-        return 1
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
+            self.first_word_hit, first_word_write_time = DCache.write(address, 0, False)
+            self.second_word_hit, second_word_write_time = DCache.write(address + 4, 0, False)
+            return first_word_write_time, second_word_write_time
+        return 1, 0
 
 
 
