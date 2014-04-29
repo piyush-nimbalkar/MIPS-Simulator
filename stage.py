@@ -22,7 +22,7 @@ class FetchStage(Stage):
     def run(self, instruction):
         STAGE['IF'] = BUSY
 
-        if not self.cache_hit and STAGE['DBUS'] == FREE:
+        if not self.cache_hit and STAGE['DBUS'] == FREE and self.cycles > 0:
             STAGE['IBUS'] = BUSY
 
         if not self.cache_hit and MemoryStage.first_bus_access:
