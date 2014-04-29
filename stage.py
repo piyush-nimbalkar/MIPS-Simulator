@@ -264,7 +264,7 @@ class MemoryStage(ExecuteStage):
 
         elif self.instruction.name == 'SW':
             address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
-            self.first_word_hit, cycles = DCache.write(address, REGISTER[self.instruction.src_reg[1]])
+            self.first_word_hit, cycles = DCache.write(address, REGISTER[self.instruction.src_reg[0]])
             return cycles, 0
 
         elif self.instruction.name == 'S.D':
