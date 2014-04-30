@@ -63,6 +63,15 @@ class DCache:
 
 
     @classmethod
+    def is_hit(self, address):
+        address -= MEMORY_BASE_ADDRESS
+        for i in range(CACHE_SETS):
+            if DCache._is_address_present_in_set(address, i):
+                return True
+        return False
+
+
+    @classmethod
     def _is_address_present_in_set(self, address, set_no):
         tag = address >> 5
         blk_no = (address >> 4) % 2

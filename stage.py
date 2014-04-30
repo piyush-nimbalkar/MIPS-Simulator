@@ -156,6 +156,7 @@ class ExecuteStage(Stage):
 
 
     def next(self):
+        # if STAGE['MEM'] == FREE and not self._bus_hazard():
         if STAGE['MEM'] == FREE:
             STAGE['IU'] = FREE
             STALLED['IU'] = False
@@ -164,6 +165,19 @@ class ExecuteStage(Stage):
         self.hazard.struct = True
         STALLED['IU'] = True
         return self
+
+
+    def _bus_hazard(self):
+        address = 0
+        if self.instruction.name in ['LW', 'L.D']:
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[0]]
+        elif self.instruction.name in ['SW', 'S.D']:
+            address = int(self.instruction.offset) + REGISTER[self.instruction.src_reg[1]]
+
+        if self.instruction.name in ['LW', 'L.D', 'SW', 'S.D']:
+            if not DCache.is_hit(address) and STAGE['IBUS'] == BUSY:
+                return True
+        return False
 
 
     def _execute(self):
