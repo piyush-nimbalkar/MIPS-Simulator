@@ -38,6 +38,12 @@ class FetchStage(Stage):
         if self.cycles == 0:
             STAGE['IBUS'] = FREE
 
+        if self.cycles <= 0 and REGISTER['FLUSH']:
+            STAGE['IF'] = FREE
+            STAGE['IBUS'] = FREE
+            REGISTER['FLUSH'] = False
+            return None
+
         if self.cycles <= 0 and STAGE['ID'] == FREE:
             STAGE['IF'] = FREE
             return DecodeStage(self.instruction)

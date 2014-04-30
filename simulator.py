@@ -198,11 +198,6 @@ def simulate_run():
                 transfer_queue.appendleft(instruction)
             else:
                 result.append(instruction.result)
-                if REGISTER['FLUSH']:
-                    result.append(instruction_queue.pop().result)
-                    STAGE['IF'] = FREE
-                    STAGE['IBUS'] = FREE
-                    REGISTER['FLUSH'] = False
 
         instruction_queue = transfer_queue
 
