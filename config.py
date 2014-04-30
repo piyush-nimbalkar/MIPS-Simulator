@@ -41,17 +41,6 @@ STAGE = {
     'DBUS': FREE
 }
 
-STALLED = {
-    'IF': False,
-    'ID': False,
-    'IU': False,
-    'MEM': False,
-    'FP_ADD': False,
-    'FP_MUL': False,
-    'FP_DIV': False,
-    'WB': False
-}
-
 FP_ADD = {
     'CYCLES': 4,
     'PIPELINED': False

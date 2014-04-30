@@ -122,7 +122,7 @@ class DecodeStage(Stage):
                 self.hazard.raw = True
 
         self.hazard.struct = False
-        if func_unit != 'NONE' and STAGE[func_unit] == BUSY and not STALLED[func_unit]:
+        if func_unit != 'NONE' and STAGE[func_unit] == BUSY:
             self.hazard.struct = True
 
 
@@ -159,11 +159,9 @@ class ExecuteStage(Stage):
         # if STAGE['MEM'] == FREE and not self._bus_hazard():
         if STAGE['MEM'] == FREE:
             STAGE['IU'] = FREE
-            STALLED['IU'] = False
             return MemoryStage(self.instruction)
 
         self.hazard.struct = True
-        STALLED['IU'] = True
         return self
 
 
