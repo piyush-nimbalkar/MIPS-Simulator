@@ -206,29 +206,35 @@ class MemoryStage(ExecuteStage):
 
     def __init__(self, instruction):
         ExecuteStage.__init__(self, instruction)
+        self.stalled_for_ibus = False
         self.first_word_hit = True
         self.second_word_hit = True
         self.first_word_cycles, self.second_word_cycles = self._calc_memory_cycles()
 
 
     def run(self, instruction):
-        if STAGE['MEM'] == FREE:
-            MemoryStage.first_bus_access = True
+        if not self.stalled_for_ibus:
+            if not self.first_word_hit:
+                MemoryStage.first_bus_access = True
+                self.stalled_for_ibus = True
+            if not self.second_word_hit and self.first_word_cycles == 0:
+                MemoryStage.first_bus_access = True
+                self.stalled_for_ibus = True
         else:
             MemoryStage.first_bus_access = False
 
-        if self.first_word_cycles == 0:
-            if not self.second_word_hit and STAGE['IBUS'] == BUSY and self.first_word_hit:
+        if MemoryStage.first_bus_access and STAGE['IBUS'] == BUSY:
+            if not self.first_word_hit:
+                self.first_word_cycles -= 1
+            elif not self.second_word_hit:
                 self.second_word_cycles -= 1
 
+        if self.first_word_cycles == 0:
             if not self.second_word_hit and STAGE['IBUS'] == FREE:
                 STAGE['DBUS'] = BUSY
 
             if self.second_word_hit or STAGE['DBUS'] == BUSY:
                 self.second_word_cycles -= 1
-
-        if not self.first_word_hit and STAGE['MEM'] == FREE and STAGE['IBUS'] == BUSY:
-            self.first_word_cycles -= 1
 
         STAGE['MEM'] = BUSY
 
