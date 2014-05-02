@@ -6,6 +6,8 @@ REGISTER = {'PC': 0, 'FLUSH': False}
 
 REGISTER_STATUS = {}
 
+LABEL = {}
+
 WORD_SIZE = 4
 
 MEMORY_SIZE = 128

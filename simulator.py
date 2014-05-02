@@ -8,8 +8,6 @@ import operator
 import sys
 
 
-labels = {}
-
 
 def parse_instructions(filename):
     file = open(filename, 'r')
@@ -18,7 +16,7 @@ def parse_instructions(filename):
         line = line.strip().upper()
         if ':' in line:
             instruction = line.split(':')
-            labels[instruction[0].strip().upper()] = Instruction.count * WORD_SIZE
+            LABEL[instruction[0].strip().upper()] = Instruction.count * WORD_SIZE
             instruction = instruction[1].strip().split(' ')
         else:
             instruction = line.split(' ')
@@ -28,8 +26,8 @@ def parse_instructions(filename):
         INSTRUCTIONS.append(Instruction(instruction_name, operands))
 
     for instr in INSTRUCTIONS:
-        if instr.immediate in labels.keys():
-            instr.set_immediate(labels[instr.immediate])
+        if instr.immediate in LABEL.keys():
+            instr.set_immediate(LABEL[instr.immediate])
 
 
 
@@ -219,7 +217,7 @@ def display_result(result):
     print('-' * 94)
     for i in range(len(result)):
         found_label = False
-        for label, address in labels.items():
+        for label, address in LABEL.items():
             if result[i].instruction.address == address:
                 found_label = True
                 print(label + ':\t'),
