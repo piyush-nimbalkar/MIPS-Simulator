@@ -240,10 +240,12 @@ if  __name__ == '__main__':
     if len(sys.argv) != 6:
         print('Usage: python simulator.py inst.txt data.txt reg.txt config.txt result.txt')
         exit()
-    parse_instructions(sys.argv[1])
-    parse_data(sys.argv[2])
-    parse_registers(sys.argv[3])
-    parse_config(sys.argv[4])
+
+    path = ""
+    parse_instructions(path + sys.argv[1])
+    parse_data(path + sys.argv[2])
+    parse_registers(path + sys.argv[3])
+    parse_config(path + sys.argv[4])
     initialize_cache()
     reset_register_status()
     simulate_run()
