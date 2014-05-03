@@ -32,12 +32,7 @@ class Parser:
         word_count = 0
 
         for line in file:
-            value = 0
-            count = (WORD_SIZE * 8) - 1
-            for i in line.strip():
-                value += pow(2, count) * int(i)
-                count -= 1
-            DATA[MEMORY_BASE_ADDRESS + (word_count * WORD_SIZE)] = value
+            DATA[MEMORY_BASE_ADDRESS + (word_count * WORD_SIZE)] = int(line, 2)
             word_count += 1
 
 
@@ -47,12 +42,7 @@ class Parser:
         reg_count = 0
 
         for line in file:
-            value = 0
-            count = (WORD_SIZE * 8) - 1
-            for i in line.strip():
-                value += pow(2, count) * int(i)
-                count -= 1
-            REGISTER['R' + str(reg_count)] = value
+            REGISTER['R' + str(reg_count)] = int(line, 2)
             reg_count += 1
 
 
