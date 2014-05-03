@@ -24,7 +24,7 @@ class Parser:
         for instr in INSTRUCTIONS:
             if instr.immediate in LABEL.keys():
                 instr.set_immediate(LABEL[instr.immediate])
-            else:
+            elif instr.type() == 'BRANCH':
                 raise Exception('Label is missing!')
 
 

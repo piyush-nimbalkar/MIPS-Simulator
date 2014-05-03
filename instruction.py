@@ -17,12 +17,12 @@ class Instruction:
         return self._full_name
 
 
-    def type(self, name):
-        if name in ['LW', 'SW', 'L.D', 'S.D']:
+    def type(self):
+        if self.name in ['LW', 'SW', 'L.D', 'S.D']:
             return 'DATA'
-        elif name in ['J', 'BEQ', 'BNE']:
+        elif self.name in ['J', 'BEQ', 'BNE']:
             return 'BRANCH'
-        elif name == 'HLT':
+        elif self.name == 'HLT':
             return 'SPECIAL'
         else:
             return 'ALU'
