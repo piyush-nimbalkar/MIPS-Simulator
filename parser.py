@@ -58,11 +58,11 @@ class Parser:
                 line = line.lower().strip()
                 split_line = line.split(':')
                 if 'adder' in split_line[0]:
-                    Parser.write_pipelining_status(FP_ADD, split_line[1])
+                    Parser._write_pipelining_status(FP_ADD, split_line[1])
                 elif 'multiplier' in split_line[0]:
-                    Parser.write_pipelining_status(FP_MUL, split_line[1])
+                    Parser._write_pipelining_status(FP_MUL, split_line[1])
                 elif 'divider' in split_line[0]:
-                    Parser.write_pipelining_status(FP_DIV, split_line[1])
+                    Parser._write_pipelining_status(FP_DIV, split_line[1])
                 elif 'memory' in split_line[0]:
                     ACCESS_TIME['MEMORY'] = int(split_line[1].strip())
                 elif 'i-cache' in split_line[0]:
@@ -78,7 +78,7 @@ class Parser:
 
 
     @classmethod
-    def write_pipelining_status(self, fu_hash, param_string):
+    def _write_pipelining_status(self, fu_hash, param_string):
         params = [x.strip() for x in param_string.split(',')]
 
         if int(params[0]) < 1 or params[1] not in ['yes', 'no']:
