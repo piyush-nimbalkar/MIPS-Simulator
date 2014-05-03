@@ -43,6 +43,8 @@ class Parser:
 
         for line in file:
             REGISTER['R' + str(reg_count)] = int(line, 2)
+            REGISTER_STATUS['R' + str(reg_count)] = FREE
+            REGISTER_STATUS['F' + str(reg_count)] = FREE
             reg_count += 1
 
 
@@ -75,10 +77,3 @@ class Parser:
             fu_hash['PIPELINED'] = True
         else:
             fu_hash['PIPELINED'] = False
-
-
-    @classmethod
-    def reset_register_status(self):
-        for i in range(32):
-            REGISTER_STATUS['R' + str(i)] = FREE
-            REGISTER_STATUS['F' + str(i)] = FREE

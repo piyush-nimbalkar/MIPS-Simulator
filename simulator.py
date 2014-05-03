@@ -155,5 +155,4 @@ if  __name__ == '__main__':
     Parser.parse_registers(path + sys.argv[3])
     Parser.parse_config(path + sys.argv[4])
     initialize_cache()
-    Parser.reset_register_status()
     simulate_run()
