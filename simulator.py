@@ -150,14 +150,14 @@ if  __name__ == '__main__':
         exit()
 
     path = ""
-    Parser.parse_instructions(path + sys.argv[1])
-    Parser.parse_data(path + sys.argv[2])
-    Parser.parse_registers(path + sys.argv[3])
 
     try:
+        Parser.parse_instructions(path + sys.argv[1])
+        Parser.parse_data(path + sys.argv[2])
+        Parser.parse_registers(path + sys.argv[3])
         Parser.parse_config(path + sys.argv[4])
     except Exception as e:
-        print('Config Error: ' + str(e))
+        print('Parse Exception: ' + str(e))
         exit()
 
     initialize_cache()

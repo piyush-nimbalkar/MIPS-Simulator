@@ -24,6 +24,8 @@ class Parser:
         for instr in INSTRUCTIONS:
             if instr.immediate in LABEL.keys():
                 instr.set_immediate(LABEL[instr.immediate])
+            else:
+                raise Exception('Label is missing!')
 
 
     @classmethod
