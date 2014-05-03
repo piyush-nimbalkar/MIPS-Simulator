@@ -1,101 +1,11 @@
 from collections import deque
-from instruction import *
 from executable import *
+from parser import *
 from icache import *
 from dcache import *
 from config import *
 import operator
 import sys
-
-
-
-def parse_instructions(filename):
-    file = open(filename, 'r')
-
-    for line in file:
-        line = line.strip().upper()
-        if ':' in line:
-            instruction = line.split(':')
-            LABEL[instruction[0].strip().upper()] = Instruction.count * WORD_SIZE
-            instruction = instruction[1].strip().split(' ')
-        else:
-            instruction = line.split(' ')
-
-        instruction_name = instruction[0]
-        operands = ''.join(instruction[1 : len(instruction)]).split(',')
-        INSTRUCTIONS.append(Instruction(instruction_name, operands))
-
-    for instr in INSTRUCTIONS:
-        if instr.immediate in LABEL.keys():
-            instr.set_immediate(LABEL[instr.immediate])
-
-
-
-def parse_registers(filename):
-    file = open(filename, 'r')
-    reg_count = 0
-
-    for line in file:
-        value = 0
-        count = (WORD_SIZE * 8) - 1
-        for i in line.strip():
-            value += pow(2, count) * int(i)
-            count -= 1
-        REGISTER['R' + str(reg_count)] = value
-        reg_count += 1
-
-
-
-def parse_data(filename):
-    file = open(filename, 'r')
-    word_count = 0
-
-    for line in file:
-        value = 0
-        count = (WORD_SIZE * 8) - 1
-        for i in line.strip():
-            value += pow(2, count) * int(i)
-            count -= 1
-        DATA[MEMORY_BASE_ADDRESS + (word_count * WORD_SIZE)] = value
-        word_count += 1
-
-
-
-def parse_config(filename):
-    file = open(filename, 'r')
-
-    for line in file:
-        line = line.lower().strip()
-        split_line = line.split(':')
-        if 'adder' in split_line[0]:
-            write_pipelining_status(FP_ADD, split_line[1])
-        elif 'multiplier' in split_line[0]:
-            write_pipelining_status(FP_MUL, split_line[1])
-        elif 'divider' in split_line[0]:
-            write_pipelining_status(FP_DIV, split_line[1])
-        elif 'memory' in split_line[0]:
-            ACCESS_TIME['MEMORY'] = int(split_line[1].strip())
-        elif 'i-cache' in split_line[0]:
-            ACCESS_TIME['ICACHE'] = int(split_line[1].strip())
-        elif 'd-cache' in split_line[0]:
-            ACCESS_TIME['DCACHE'] = int(split_line[1].strip())
-
-
-
-def write_pipelining_status(fu_hash, param_string):
-    params = [x.strip() for x in param_string.split(',')]
-    fu_hash['CYCLES'] = int(params[0])
-    if params[1] == 'yes':
-        fu_hash['PIPELINED'] = True
-    else:
-        fu_hash['PIPELINED'] = False
-
-
-
-def reset_register_status():
-    for i in range(32):
-        REGISTER_STATUS['R' + str(i)] = FREE
-        REGISTER_STATUS['F' + str(i)] = FREE
 
 
 
@@ -240,10 +150,10 @@ if  __name__ == '__main__':
         exit()
 
     path = ""
-    parse_instructions(path + sys.argv[1])
-    parse_data(path + sys.argv[2])
-    parse_registers(path + sys.argv[3])
-    parse_config(path + sys.argv[4])
+    Parser.parse_instructions(path + sys.argv[1])
+    Parser.parse_data(path + sys.argv[2])
+    Parser.parse_registers(path + sys.argv[3])
+    Parser.parse_config(path + sys.argv[4])
     initialize_cache()
-    reset_register_status()
+    Parser.reset_register_status()
     simulate_run()
