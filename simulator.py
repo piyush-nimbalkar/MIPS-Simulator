@@ -153,6 +153,12 @@ if  __name__ == '__main__':
     Parser.parse_instructions(path + sys.argv[1])
     Parser.parse_data(path + sys.argv[2])
     Parser.parse_registers(path + sys.argv[3])
-    Parser.parse_config(path + sys.argv[4])
+
+    try:
+        Parser.parse_config(path + sys.argv[4])
+    except Exception as e:
+        print('Config Error: ' + str(e))
+        exit()
+
     initialize_cache()
     simulate_run()

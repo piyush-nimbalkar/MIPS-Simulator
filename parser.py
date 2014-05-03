@@ -50,8 +50,14 @@ class Parser:
 
     @classmethod
     def parse_config(self, filename):
-        file = open(filename, 'r')
+        try:
+            Parser.extract_config_options(open(filename, 'r'))
+        except:
+            raise Exception('Invalid config file!')
 
+
+    @classmethod
+    def extract_config_options(self, file):
         for line in file:
             line = line.lower().strip()
             split_line = line.split(':')
@@ -72,6 +78,13 @@ class Parser:
     @classmethod
     def write_pipelining_status(self, fu_hash, param_string):
         params = [x.strip() for x in param_string.split(',')]
+
+        if int(params[0]) <= 0:
+            raise Exception('Cycles should be positive!')
+
+        if params[1] not in ['yes', 'no']:
+            raise Exception('Pipeline status should be either "yes" or "no"!')
+
         fu_hash['CYCLES'] = int(params[0])
         if params[1] == 'yes':
             fu_hash['PIPELINED'] = True
