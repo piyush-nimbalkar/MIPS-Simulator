@@ -149,13 +149,11 @@ if  __name__ == '__main__':
         print('Usage: python simulator.py inst.txt data.txt reg.txt config.txt result.txt')
         exit()
 
-    path = ""
-
     try:
-        Parser.parse_instructions(path + sys.argv[1])
-        Parser.parse_data(path + sys.argv[2])
-        Parser.parse_registers(path + sys.argv[3])
-        Parser.parse_config(path + sys.argv[4])
+        Parser.parse_instructions(sys.argv[1])
+        Parser.parse_data(sys.argv[2])
+        Parser.parse_registers(sys.argv[3])
+        Parser.parse_config(sys.argv[4])
     except Exception as e:
         print('Parse Exception: ' + str(e))
         exit()
