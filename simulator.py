@@ -8,6 +8,8 @@ import operator
 import sys
 
 
+result = []
+
 
 def initialize_cache():
     ICache()
@@ -91,9 +93,10 @@ def reorder_instructions(old_queue):
 
 
 def simulate_run():
+    global result
+
     instruction_queue = deque([])
     clock_cycle = 1
-    result = []
     REGISTER['PC'] = 1
     instruction_queue.appendleft(Executable(INSTRUCTIONS[0], clock_cycle))
 
@@ -115,32 +118,37 @@ def simulate_run():
             instruction_queue.appendleft(Executable(INSTRUCTIONS[REGISTER['PC']], clock_cycle))
             REGISTER['PC'] += 1
 
-    display_result(result)
 
 
+def print_result(filename):
+    res = sorted(result, key=lambda x: x.IF_cycle)
+    res[len(res) - 1].ID_cycle = 0
 
-def display_result(result):
-    result = sorted(result, key=lambda x: x.IF_cycle)
-    result[len(result) - 1].ID_cycle = 0
-    print('-' * 94)
-    print('\tInstruction\t\tFT\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct')
-    print('-' * 94)
-    for i in range(len(result)):
+    output = ''
+    output += '-' * 94 + '\n'
+    output += '\tInstruction\t\tFT\tID\tEX\tWB\tRAW\tWAR\tWAW\tStruct\n'
+    output += '-' * 94 + '\n'
+
+    for i in range(len(res)):
         found_label = False
         for label, address in LABEL.items():
-            if result[i].instruction.address == address:
+            if res[i].instruction.address == address:
                 found_label = True
-                print(label + ':\t'),
+                output += label + ':\t'
         if not found_label:
-            print('\t'),
-        print(result[i])
-    print('-' * 94)
+            output += '\t'
+        output += str(res[i]) + '\n'
 
-    print("\nTotal number of access requests for instruction cache: " + str(ICache.request_count))
-    print("Number of instruction cache hits: " + str(ICache.hit_count))
-    print("\nTotal number of access requests for data cache: " + str(DCache.request_count))
-    print("Number of data cache hits: " + str(DCache.hit_count))
-    print
+    output += '-' * 94 + '\n'
+    output += '\nTotal number of access requests for instruction cache: ' + str(ICache.request_count)
+    output += '\nNumber of instruction cache hits: ' + str(ICache.hit_count)
+    output += '\nTotal number of access requests for data cache: ' + str(DCache.request_count)
+    output += '\nNumber of data cache hits: ' + str(DCache.hit_count)
+
+    file = open(filename, 'w')
+    file.write(output)
+    file.close()
+    print output
 
 
 
@@ -160,3 +168,4 @@ if  __name__ == '__main__':
 
     initialize_cache()
     simulate_run()
+    print_result(sys.argv[5])
