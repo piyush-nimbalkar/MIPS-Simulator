@@ -21,4 +21,3 @@ Run the following command for the same:
 ```
 chmod +x make.sh
 ```
-

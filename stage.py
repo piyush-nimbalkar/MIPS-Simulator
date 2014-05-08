@@ -156,7 +156,6 @@ class ExecuteStage(Stage):
 
 
     def next(self):
-        # if STAGE['MEM'] == FREE and not self._bus_hazard():
         if STAGE['MEM'] == FREE:
             STAGE['IU'] = FREE
             return MemoryStage(self.instruction)
